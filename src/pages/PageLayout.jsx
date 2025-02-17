@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import ChatInterface from "../components/ChatInterface";
 import SideBar from "../components/SideBar";
-import AppHeader from "../components/APPHeader";
+import AppHeader from "../components/AppHeader";
 
 function PageLayout() {
     const [showSideBar, setShowSideBar] = useState(false);
