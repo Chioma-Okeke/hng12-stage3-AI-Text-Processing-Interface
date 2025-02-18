@@ -6,6 +6,7 @@
 // import Outreaches from "./pages/Outreaches";
 // import SkillAcquisitionPage from "./pages/SkillAcquisition";
 import PageLayout from "./pages/PageLayout";
+import { Toaster } from "sonner";
 
 import {
     createBrowserRouter,
@@ -17,10 +18,7 @@ import {
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
-            <Route
-                path="/"
-                element={<PageLayout />}
-            />
+            <Route path="/" element={<PageLayout />} />
         </Route>
     )
 );
@@ -28,6 +26,7 @@ const router = createBrowserRouter(
 function App() {
     return (
         <div>
+            {/* <Toaster position="top-right" />; */}
             <RouterProvider router={router}></RouterProvider>
         </div>
     );

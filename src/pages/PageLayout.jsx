@@ -147,7 +147,7 @@ function PageLayout() {
                                     "Neural Nexus"
                                 ]}
                                 dropDownClass="drop-container"
-                                className="w-[40%]"
+                                className="w-[60%] sm:w-[40%]"
                                 setSelectedOption={chosenTheme}
                                 selectedOption={selectedTheme}
                             />

@@ -10,10 +10,10 @@ function AppHeader({ showSideBar, setShowSideBar }) {
                     <HiOutlineMenuAlt1 
                         size={25} 
                         onClick={() => setShowSideBar(true)}
-                        className="cursor-pointer" 
+                        className="cursor-pointer hover:scale-110 transition-transform ease-in-out duration-300" 
                     />
                 )}
-                <h1 className={`${showSideBar ? "flex-1 text-center" : ""}`}>Texifyit</h1>
+                <h1 className={`logo ${showSideBar ? "flex-1 text-center" : ""}`}>Texifyit</h1>
                 <img src={editIcon} alt="Edit Icon" className="cursor-pointer" />
             </div>
         </header>

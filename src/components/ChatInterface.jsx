@@ -1,72 +1,225 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoIosSend } from "react-icons/io";
+import Button from "./reusables/Button";
+import { motion } from "framer-motion";
+import useTypingEffect from "../hooks/useTypingEffect";
+import TypingMessage from "./reusables/TypingMessage";
+
+const supportedLanguages = [
+    {
+        option: "English (en)",
+        value: "en",
+    },
+    {
+        option: "French (fr)",
+        value: "fr",
+    },
+    {
+        option: "Portuguese (pt)",
+        value: "pt",
+    },
+    {
+        option: "Russian (ru)",
+        value: "ru",
+    },
+    {
+        option: "Spanish (es)",
+        value: "es",
+    },
+    {
+        option: "Turkish (tr)",
+        value: "tr",
+    },
+];
 
 function ChatInterface({ selectedTheme }) {
-    console.log(selectedTheme, "here");
     const [messages, setMessages] = useState([
-        { id: 1, text: "Hello! How are you?", sender: "other" },
-        { id: 2, text: "I'm good! What about you?", sender: "me" },
-        { id: 3, text: "I'm good! What about you?", sender: "me" },
-        { id: 4, text: "I'm good! What about you?", sender: "me" },
-        { id: 5, text: "I'm good! What about you?", sender: "me" },
-        { id: 6, text: "I'm good! What about you?", sender: "me" },
-        { id: 7, text: "I'm good! What about you?", sender: "me" },
-        { id: 8, text: "I'm good! What about you?", sender: "me" },
-        { id: 9, text: "I'm good! What about you?", sender: "me" },
-        { id: 10, text: "I'm good! What about you?", sender: "me" },
-        { id: 11, text: "I'm good! What about you?", sender: "me" },
-        { id: 12, text: "I'm good! What about you?", sender: "me" },
-        { id: 13, text: "I'm good! What about you?", sender: "me" },
-        { id: 13, text: "I'm good! What about you?", sender: "me" },
-        { id: 13, text: "I'm good! What about you?", sender: "me" },
-        { id: 13, text: "I'm good! What about you?", sender: "me" },
-        { id: 13, text: "I'm good! What about you?", sender: "me" },
-        { id: 13, text: "I'm good! What about you?", sender: "me" },
-        { id: 13, text: "I'm good! What about you?", sender: "me" },
+        { id: 1, text: "Hello! How are you?", sender: "AI" },
+        { id: 2, text: "I'm good! What about you?", sender: "user" },
     ]);
     const [input, setInput] = useState("");
+    const [detectedLanguage, setDetectedLanguage] = useState("English");
+    const textRef = useRef(null);
+    const chatRef = useRef(null);
+    const AIRef = useRef(null)
+
+    useEffect(() => {
+        const savedMessages = localStorage.getItem("currentMessages")
+        if (!savedMessages) return
+        setMessages(JSON.parse(savedMessages))
+    }, [])
+
+    useEffect(() => {
+        localStorage.setItem("currentMessages", JSON.stringify(messages))
+    }, [messages])
+
+    useEffect(() => {
+        if (chatRef.current) {
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }
+    });
+
+    const sendMessage = () => {
+        if (!input.trim()) return;
+        setMessages((prev) => [
+            ...prev,
+            { id: prev.length + 1, text: input, sender: "user" },
+        ]);
+        setInput("");
+        if (textRef.current) {
+            textRef.current.style.height = "auto";
+        }
+    };
+
+    const summarizeText = (message) => {
+        if (detectedLanguage !== "English") {
+            console.log("We only summarize english texts");
+            return;
+        }
+        try {
+            const indexOfAIResponse = messages.findIndex(
+                (msg) => msg.summarizedId === message.id
+            );
+            if (indexOfAIResponse !== -1) {
+                setMessages((prev) => {
+                    const updatedMessages = [...prev]
+                    updatedMessages[indexOfAIResponse] = {
+                        ...updatedMessages[indexOfAIResponse],
+                        text: "Here is the updated summary..."
+                    }
+                    return updatedMessages
+                })
+                console.log(messages, "updated messages")
+                return
+            }
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: prev.length + 1,
+                    text: "Summarized text",
+                    sender: "AI",
+                    summarizedId: message.id,
+                },
+            ]);
+            console.log(messages, "updated messages")
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     function autoExpand(textarea) {
-        textarea.style.height = "auto"; // Reset height
-        textarea.style.height = textarea.scrollHeight + "px"; // Expand dynamically
+        textarea.style.height = "auto"; 
+        textarea.style.height = textarea.scrollHeight + "px";
     }
 
     return (
         <div className="absolute inset-0 flex flex-col max-h-[calc(100vh - 65px)]">
             <div className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
                 {/* Messages container with fixed height and scroll */}
-                <div className="flex-1 overflow-y-auto min-h-0 relative mb-20">
-                    <div className="absolute inset-0 overflow-y-auto px-5">
-                        <div className="py-4 space-y-4">
-                            {messages.map((msg) => (
-                                <article
-                                    key={msg.id}
-                                    className={`rounded-lg ${
-                                        msg.sender === "me"
-                                            ? `ml-auto flex flex-col max-w-[250px]  sm:max-w-sm`
-                                            : ""
-                                    }`}
-                                >
-                                    <p
-                                        className={`p-3 rounded-lg ${
-                                            msg.sender === "me"
-                                                ? ` ${
-                                                      selectedTheme ===
-                                                      "Neural Nexus"
-                                                          ? "shadow-lg shadow-teal-300/30"
-                                                          : " "
-                                                  } chat-bubble`
-                                                : ""
-                                        }`}
-                                    >
-                                        {msg.text}
-                                    </p>
-                                    {msg.sender === "me" && (
-                                        <span className="text-xs italic">
-                                            Detected Language: {}
-                                        </span>
-                                    )}
-                                </article>
-                            ))}
+                <div
+                    className="flex-1 overflow-y-auto min-h-0 relative mb-24"
+                    ref={chatRef}
+                >
+                    <div className="absolute inset-0 lg:px-5 pb-5">
+                        <div className="py-4 space-y-4 relative h-full">
+                            {messages.length === 0 && (
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
+                                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center ">
+                                        Welcome, let&apos;s get started!
+                                    </h1>
+                                </div>
+                            )}
+                            {messages?.map((msg) => {
+                                return (
+                                    <div key={msg.id}>
+                                        <motion.article
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{
+                                                duration: 0.3,
+                                                ease: "easeInOut",
+                                            }}
+                                            className={`rounded-lg ${
+                                                msg.sender === "user"
+                                                    ? `ml-auto flex flex-col max-w-[250px]  sm:max-w-sm`
+                                                    : ""
+                                            }`}
+                                        >
+                                            <p
+                                                className={`rounded-lg ${
+                                                    msg.sender === "user"
+                                                        ? ` ${
+                                                              selectedTheme ===
+                                                              "Neural Nexus"
+                                                                  ? "shadow-lg shadow-teal-300/30"
+                                                                  : " "
+                                                          } chat-bubble p-3`
+                                                        : ""
+                                                }`}
+                                            >
+                                                {msg.sender === "AI" ? (
+                                                    <TypingMessage ref={AIRef}
+                                                        text={msg.text}
+                                                    />
+                                                ) : (
+                                                    msg.text
+                                                )}
+                                            </p>
+                                            {msg.sender === "user" && (
+                                                <span className="text-xs italic">
+                                                    Detected Language: {}
+                                                </span>
+                                            )}
+                                        </motion.article>
+                                        {msg.sender === "user" && (
+                                            <div className="mt-5 w-full flex flex-col md:flex-row gap-4 md:gap-8 justify-center items-center">
+                                                {msg.text.length > 150 && (
+                                                    <Button
+                                                        onClick={() =>
+                                                            summarizeText(msg)
+                                                        }
+                                                        className="action-button"
+                                                    >
+                                                        Summarize
+                                                    </Button>
+                                                )}
+                                                <div className="flex flex-col sm:flex-row gap-4 items-center">
+                                                    <select
+                                                        className="select-container focus:outline-none"
+                                                        name=""
+                                                        id=""
+                                                    >
+                                                        {supportedLanguages.map(
+                                                            (
+                                                                language,
+                                                                index
+                                                            ) => {
+                                                                return (
+                                                                    <option
+                                                                        value={
+                                                                            language.value
+                                                                        }
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            language.option
+                                                                        }
+                                                                    </option>
+                                                                );
+                                                            }
+                                                        )}
+                                                    </select>
+                                                    <Button className="action-button">
+                                                        Translate
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -74,6 +227,7 @@ function ChatInterface({ selectedTheme }) {
                 <div className="input-container absolute bottom-2 left-1/2 -translate-x-1/2 md:-translate-x-0 md:left-0 w-[95%] md:w-full max-h-[200px]">
                     <div className="flex items-center gap-2">
                         <textarea
+                            ref={textRef}
                             className="flex-1 p-2 focus:outline-none resize-none overflow--y-auto max-h-[150px]"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
@@ -81,9 +235,12 @@ function ChatInterface({ selectedTheme }) {
                             onInput={(e) => autoExpand(e.target)}
                             placeholder="Type a message..."
                         />
-                        <button className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors">
+                        <Button
+                            onClick={sendMessage}
+                            className=" p-2 rounded-full"
+                        >
                             <IoIosSend size={25} />
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

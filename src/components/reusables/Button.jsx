@@ -1,19 +1,18 @@
 import PropTypes from "prop-types";
 
 function Button({ children, className, onClick, href, ...props }) {
-    const Component = href ? "a" : "button"; 
 
     return (
-        <Component
+        <button
             {...props}
             href={href}
             target={href ? "_blank" : undefined}
             rel={href ? "noopener noreferrer" : undefined}
             onClick={onClick}
-            className={`px-6 py-3 text-center ${className}`}
+            className={` text-center ${className}`}
         >
             {children}
-        </Component>
+        </button>
     );
 }
 
