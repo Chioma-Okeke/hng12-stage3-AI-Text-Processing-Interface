@@ -35,7 +35,7 @@ function Modal({ closeModal, children }) {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.4 }}
-                        className="modal-wrapper flex items-center z-50 relative xl:w-[70%] justify-center"
+                        className="flex items-center z-50 relative justify-center w-full"
                     >
                         {children}
                     </motion.div>

@@ -4,7 +4,7 @@ import editIcon from "../assets/edit.svg";
 
 function AppHeader({ showSideBar, setShowSideBar }) {
     return (
-        <header className="p-5 w-full bg-white mb-2">
+        <header className="p-5 w-full header mb-2">
             <div className="flex items-center justify-between">
                 {!showSideBar && (
                     <HiOutlineMenuAlt1 
@@ -13,7 +13,7 @@ function AppHeader({ showSideBar, setShowSideBar }) {
                         className="cursor-pointer" 
                     />
                 )}
-                <h1 className={`${showSideBar ? "flex-1 text-center" : ""}`}>Texify</h1>
+                <h1 className={`${showSideBar ? "flex-1 text-center" : ""}`}>Texifyit</h1>
                 <img src={editIcon} alt="Edit Icon" className="cursor-pointer" />
             </div>
         </header>

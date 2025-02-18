@@ -1,48 +1,59 @@
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 import { HiOutlineMenuAlt1 } from "react-icons/hi";
+import { IoSettingsOutline } from "react-icons/io5";
+import { LuCircleHelp } from "react-icons/lu";
 // import useThemeSwitcher from "../../../hooks/useThemeSwitcher";
 
-function SideBar({ setShowSideBar, handleSideBarToggle }) {
+function SideBar({
+    setShowSideBar,
+    handleSideBarToggle,
+    setOpenSettings,
+    setOpenHelp,
+    selectedTheme,
+}) {
+    // const [openSettings, setOpenSettings] = useState(false);
+    // const [isLocked, setIsLocked] = useState(false);
+    // const [selectedTheme, setSelectedTheme] = useState("Light");
+    // const [openHelp, setOpenHelp] = useState(false);
     // const [theme, setTheme] = useThemeSwitcher();
 
     return (
-        <section className=" py-10 pl-6 pr-6 h-screen bg-gray-400">
+        <section
+            className={`p-5 pr-10 h-full sidebar ${
+                selectedTheme === "Neural Nexus"
+                    ? "shadow-[8px_0px_16px_rgba(94,234,212,0.3)]"
+                    : " "
+            }`}
+        >
             <div className="flex flex-col justify-between h-full">
                 <div className="flex justify-between items-center">
                     <div
-                        className="mb-12 cursor-pointer hover:scale-105 w-fit"
+                        className="cursor-pointer hover:scale-105 w-fit"
                         onClick={() => setShowSideBar(false)}
                     >
-                        <HiOutlineMenuAlt1 size={25}/>
+                        <HiOutlineMenuAlt1 size={25} />
                     </div>
-                    <Link
-                        to={"/user/dashboard"}
+                    {/* <span className="text-soft-dark dark:text-primary-light">
+                        Texifyit
+                    </span> */}
+                </div>
+                <div className="flex items-center justify-between">
+                    <IoSettingsOutline
                         onClick={() => {
-                            if (window.innerWidth < 1024) handleSideBarToggle();
+                            setOpenSettings(true);
+                            handleSideBarToggle();
                         }}
-                        className={({ isActive }) => {
-                            return (
-                                "flex items-center gap-3 mb-4 p-2 dark:hover:bg-primary-dark rounded-lg " +
-                                (isActive
-                                    ? "bg-primary-light dark:bg-primary-dark"
-                                    : "")
-                            );
+                        size={25}
+                        className="cursor-pointer hover:scale-110 transition-all ease-in-out duration-300"
+                    />
+                    <LuCircleHelp
+                        onClick={() => {
+                            setOpenHelp(true);
+                            handleSideBarToggle();
                         }}
-                    >
-                        {/* {theme === "dark" ? (
-                                    <img src={LogoDark} alt="Dark Logo" />
-                                ) : (
-                                    <img
-                                        src={LogoLight}
-                                        alt="Light Logo"
-                                        className="w-[21.45px]"
-                                    />
-                                )} */}
-                        <span className="text-soft-dark dark:text-primary-light">
-                            InterviewAI
-                        </span>
-                    </Link>
+                        size={25}
+                        className="cursor-pointer hover:scale-110 transition-all ease-in-out duration-300"
+                    />
                 </div>
             </div>
         </section>

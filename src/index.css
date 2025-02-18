@@ -2,6 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+/* :root {
+  --bg-color: #ffffff;
+  --text-color: "#333333";
+  --chat-bubble: "#D1E8FF";
+  --sidebar-bg-color: "#ffffff";
+  --sidebar-border-color: "#E0E0E0";
+  --input-field: "#F9FAFB";
+} */
+
+body, .header, .drop-container {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.chat-bubble {
+  background-color: var(--chat-bubble);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar, .modal-container {
+  background-color: var(--sidebar-bg-color);
+  border-right: 1px solid var(--sidebar-border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.input-container {
+  background-color: var(--bg-color);
+  border: 1px solid var(--sidebar-border-color);
+  border-radius: 12px;
+  padding: 12px 20px 12px 12px;
+}
+
+.input-container textarea {
+  background-color: transparent;
+  outline: none;
+  border: none;
+}
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
