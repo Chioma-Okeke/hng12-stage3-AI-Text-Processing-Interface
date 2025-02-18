@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoIosSend } from "react-icons/io";
 import Button from "./reusables/Button";
 import { motion } from "framer-motion";
-import useTypingEffect from "../hooks/useTypingEffect";
 import TypingMessage from "./reusables/TypingMessage";
+import PropTypes from "prop-types";
+import { toast } from "sonner";
 
 const supportedLanguages = [
     {
@@ -33,15 +34,11 @@ const supportedLanguages = [
 ];
 
 function ChatInterface({ selectedTheme }) {
-    const [messages, setMessages] = useState([
-        { id: 1, text: "Hello! How are you?", sender: "AI" },
-        { id: 2, text: "I'm good! What about you?", sender: "user" },
-    ]);
+    const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [detectedLanguage, setDetectedLanguage] = useState("English");
     const textRef = useRef(null);
     const chatRef = useRef(null);
-    const AIRef = useRef(null)
 
     useEffect(() => {
         const savedMessages = localStorage.getItem("currentMessages")
@@ -73,7 +70,8 @@ function ChatInterface({ selectedTheme }) {
 
     const summarizeText = (message) => {
         if (detectedLanguage !== "English") {
-            console.log("We only summarize english texts");
+            console.log("only english")
+            toast.error("We only summarize English texts");
             return;
         }
         try {
@@ -90,6 +88,7 @@ function ChatInterface({ selectedTheme }) {
                     return updatedMessages
                 })
                 console.log(messages, "updated messages")
+                toast.success("Summarized text updated Successfully")
                 return
             }
             setMessages((prev) => [
@@ -102,7 +101,9 @@ function ChatInterface({ selectedTheme }) {
                 },
             ]);
             console.log(messages, "updated messages")
+            toast.success("Summarized text Successfully")
         } catch (error) {
+            toast.error("An error occurred while summarizing text")
             console.error(error);
         }
     };
@@ -158,7 +159,7 @@ function ChatInterface({ selectedTheme }) {
                                                 }`}
                                             >
                                                 {msg.sender === "AI" ? (
-                                                    <TypingMessage ref={AIRef}
+                                                    <TypingMessage
                                                         text={msg.text}
                                                     />
                                                 ) : (
@@ -246,6 +247,10 @@ function ChatInterface({ selectedTheme }) {
             </div>
         </div>
     );
+}
+
+ChatInterface.propTypes = {
+    selectedTheme: PropTypes.string
 }
 
 export default ChatInterface;

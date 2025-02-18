@@ -26,8 +26,19 @@ const router = createBrowserRouter(
 function App() {
     return (
         <div>
-            {/* <Toaster position="top-right" />; */}
-            <RouterProvider router={router}></RouterProvider>
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    className: "toast-class",
+                    success: {
+                        className: "success-text"
+                    },
+                    error: {
+                        className: "error-text"
+                    }
+                }}
+            />
+            ;<RouterProvider router={router}></RouterProvider>
         </div>
     );
 }

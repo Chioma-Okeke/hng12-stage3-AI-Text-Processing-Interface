@@ -81,6 +81,21 @@ body, .header, .drop-container {
   box-shadow: 0px 0px 10px var(--chat-bubble);
 }
 
+.toast-class {
+  border: 2px solid var(--sidebar-border-color);
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.success-text {
+  color: green
+}
+.error-text {
+  color: green
+}
+
 @media (max-width: 640px) {
   .logo {
     font-size: 2rem;
