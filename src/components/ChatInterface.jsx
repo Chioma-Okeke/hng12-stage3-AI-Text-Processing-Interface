@@ -38,9 +38,16 @@ function ChatInterface({ selectedTheme }) {
                     <div className="absolute inset-0 overflow-y-auto px-5">
                         <div className="py-4 space-y-4">
                             {messages.map((msg) => (
-                                <article key={msg.id} className="max-w-xs ml-auto flex flex-col">
+                                <article
+                                    key={msg.id}
+                                    className={`rounded-lg ${
+                                        msg.sender === "me"
+                                            ? `ml-auto flex flex-col max-w-[250px]  sm:max-w-sm`
+                                            : ""
+                                    }`}
+                                >
                                     <p
-                                        className={`p-3 rounded-lg text-white ${
+                                        className={`p-3 rounded-lg ${
                                             msg.sender === "me"
                                                 ? ` ${
                                                       selectedTheme ===
@@ -48,19 +55,23 @@ function ChatInterface({ selectedTheme }) {
                                                           ? "shadow-lg shadow-teal-300/30"
                                                           : " "
                                                   } chat-bubble`
-                                                : "bg-gray-500"
+                                                : ""
                                         }`}
                                     >
                                         {msg.text}
                                     </p>
-                                    <span className="text-xs italic">Detected Language: {}</span>
+                                    {msg.sender === "me" && (
+                                        <span className="text-xs italic">
+                                            Detected Language: {}
+                                        </span>
+                                    )}
                                 </article>
                             ))}
                         </div>
                     </div>
                 </div>
                 {/* Input area fixed at bottom */}
-                <div className="input-container absolute bottom-2 left-0 w-full max-h-[200px]">
+                <div className="input-container absolute bottom-2 left-1/2 -translate-x-1/2 md:-translate-x-0 md:left-0 w-[95%] md:w-full max-h-[200px]">
                     <div className="flex items-center gap-2">
                         <textarea
                             className="flex-1 p-2 focus:outline-none resize-none overflow--y-auto max-h-[150px]"
@@ -71,7 +82,7 @@ function ChatInterface({ selectedTheme }) {
                             placeholder="Type a message..."
                         />
                         <button className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors">
-                            <IoIosSend size={20} />
+                            <IoIosSend size={25} />
                         </button>
                     </div>
                 </div>
