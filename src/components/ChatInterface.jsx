@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import TypingMessage from "./reusables/TypingMessage";
 import PropTypes from "prop-types";
 import { toast } from "sonner";
+import { update } from "lodash";
 
 const supportedLanguages = [
     {
@@ -36,19 +37,19 @@ const supportedLanguages = [
 function ChatInterface({ selectedTheme }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
-    const [detectedLanguage, setDetectedLanguage] = useState("English");
+    const [detectedLanguage, setDetectedLanguage] = useState("French");
     const textRef = useRef(null);
     const chatRef = useRef(null);
 
     useEffect(() => {
-        const savedMessages = localStorage.getItem("currentMessages")
-        if (!savedMessages) return
-        setMessages(JSON.parse(savedMessages))
-    }, [])
+        const savedMessages = localStorage.getItem("currentMessages");
+        if (!savedMessages) return;
+        setMessages(JSON.parse(savedMessages));
+    }, []);
 
     useEffect(() => {
-        localStorage.setItem("currentMessages", JSON.stringify(messages))
-    }, [messages])
+        localStorage.setItem("currentMessages", JSON.stringify(messages));
+    }, [messages]);
 
     useEffect(() => {
         if (chatRef.current) {
@@ -60,17 +61,35 @@ function ChatInterface({ selectedTheme }) {
         if (!input.trim()) return;
         setMessages((prev) => [
             ...prev,
-            { id: prev.length + 1, text: input, sender: "user" },
+            {
+                id: prev.length + 1,
+                text: input,
+                sender: "user",
+                detectedLanguage: detectedLanguage,
+            },
         ]);
         setInput("");
         if (textRef.current) {
             textRef.current.style.height = "auto";
         }
+        try {
+            console.log("detecting language api call");
+            setMessages((prev) => {
+                const updatedMessages = [...prev];
+                updatedMessages[updatedMessages.length - 1].detectedLanguage =
+                    "English";
+                return updatedMessages;
+            });
+            setDetectedLanguage("English");
+        } catch (error) {
+            console.error(error);
+            toast.error("An error occurred while detecting language");
+        }
     };
 
     const summarizeText = (message) => {
-        if (detectedLanguage !== "English") {
-            console.log("only english")
+        if (message.detectedLanguage !== "English") {
+            console.log("only english");
             toast.error("We only summarize English texts");
             return;
         }
@@ -80,16 +99,16 @@ function ChatInterface({ selectedTheme }) {
             );
             if (indexOfAIResponse !== -1) {
                 setMessages((prev) => {
-                    const updatedMessages = [...prev]
+                    const updatedMessages = [...prev];
                     updatedMessages[indexOfAIResponse] = {
                         ...updatedMessages[indexOfAIResponse],
-                        text: "Here is the updated summary..."
-                    }
-                    return updatedMessages
-                })
-                console.log(messages, "updated messages")
-                toast.success("Summarized text updated Successfully")
-                return
+                        text: "Here is the updated summary...",
+                    };
+                    return updatedMessages;
+                });
+                console.log(messages, "updated messages");
+                toast.success("Summarized text updated Successfully");
+                return;
             }
             setMessages((prev) => [
                 ...prev,
@@ -100,16 +119,16 @@ function ChatInterface({ selectedTheme }) {
                     summarizedId: message.id,
                 },
             ]);
-            console.log(messages, "updated messages")
-            toast.success("Summarized text Successfully")
+            console.log(messages, "updated messages");
+            toast.success("Summarized text Successfully");
         } catch (error) {
-            toast.error("An error occurred while summarizing text")
+            toast.error("An error occurred while summarizing text");
             console.error(error);
         }
     };
 
     function autoExpand(textarea) {
-        textarea.style.height = "auto"; 
+        textarea.style.height = "auto";
         textarea.style.height = textarea.scrollHeight + "px";
     }
 
@@ -168,7 +187,8 @@ function ChatInterface({ selectedTheme }) {
                                             </p>
                                             {msg.sender === "user" && (
                                                 <span className="text-xs italic">
-                                                    Detected Language: {}
+                                                    Detected Language:{" "}
+                                                    {msg.detectedLanguage}
                                                 </span>
                                             )}
                                         </motion.article>
@@ -250,7 +270,7 @@ function ChatInterface({ selectedTheme }) {
 }
 
 ChatInterface.propTypes = {
-    selectedTheme: PropTypes.string
-}
+    selectedTheme: PropTypes.string,
+};
 
 export default ChatInterface;
