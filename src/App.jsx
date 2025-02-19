@@ -38,7 +38,7 @@ function App() {
                     }
                 }}
             />
-            ;<RouterProvider router={router}></RouterProvider>
+            <RouterProvider router={router}></RouterProvider>
         </div>
     );
 }

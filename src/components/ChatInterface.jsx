@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import TypingMessage from "./reusables/TypingMessage";
 import PropTypes from "prop-types";
 import { toast } from "sonner";
-import { update } from "lodash";
 
 const supportedLanguages = [
     {
@@ -34,8 +33,8 @@ const supportedLanguages = [
     },
 ];
 
-function ChatInterface({ selectedTheme }) {
-    const [messages, setMessages] = useState([]);
+function ChatInterface({ selectedTheme, setMessages, messages }) {
+    // const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [detectedLanguage, setDetectedLanguage] = useState("French");
     const textRef = useRef(null);
@@ -65,7 +64,7 @@ function ChatInterface({ selectedTheme }) {
                 id: prev.length + 1,
                 text: input,
                 sender: "user",
-                detectedLanguage: detectedLanguage,
+                detectedLanguage: "",
             },
         ]);
         setInput("");
@@ -81,6 +80,7 @@ function ChatInterface({ selectedTheme }) {
                 return updatedMessages;
             });
             setDetectedLanguage("English");
+            toast.success("Language detection successful")
         } catch (error) {
             console.error(error);
             toast.error("An error occurred while detecting language");
@@ -89,7 +89,6 @@ function ChatInterface({ selectedTheme }) {
 
     const summarizeText = (message) => {
         if (message.detectedLanguage !== "English") {
-            console.log("only english");
             toast.error("We only summarize English texts");
             return;
         }

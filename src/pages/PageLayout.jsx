@@ -11,6 +11,7 @@ import Select from "../components/reusables/Select";
 import Button from "../components/reusables/Button";
 import { applyTheme } from "../utils/theme";
 import { makeCamelCase, removeCamelCase } from "../utils/textConveters";
+import { toast } from "sonner";
 
 const FAQ = [
     {
@@ -45,18 +46,19 @@ function PageLayout() {
     const [isLocked, setIsLocked] = useState(false);
     const [selectedTheme, setSelectedTheme] = useState("");
     const [openHelp, setOpenHelp] = useState(false);
+    const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem("selectedTheme") || "light"
-        applyTheme(savedTheme)
-        setSelectedTheme(removeCamelCase(savedTheme))
-    }, [])
+        const savedTheme = localStorage.getItem("selectedTheme") || "light";
+        applyTheme(savedTheme);
+        setSelectedTheme(removeCamelCase(savedTheme));
+    }, []);
 
     const chosenTheme = useCallback((option) => {
-        const camelCasedOption = makeCamelCase(option)
-        applyTheme(camelCasedOption)
-        setSelectedTheme(option)
-    }, [])
+        const camelCasedOption = makeCamelCase(option);
+        applyTheme(camelCasedOption);
+        setSelectedTheme(option);
+    }, []);
 
     function closeSideBar() {
         if (window.innerWidth < 1024 && showSideBar) {
@@ -66,6 +68,17 @@ function PageLayout() {
 
     const handleSideBarToggle = () => {
         setShowSideBar((prevState) => !prevState);
+    };
+
+    const deleteChats = () => {
+        localStorage.removeItem("currentMessage");
+        const messages = localStorage.getItem("currentMessage");
+        if (messages)
+            return toast.error("An error occurred when deleting messages");
+        toast.success("Messages successfully deleted.");
+        setMessages([]);
+        setOpenSettings(false);
+        setIsLocked(false);
     };
 
     const sidebarWidth = window.innerWidth > 1280 ? "261px" : "";
@@ -113,7 +126,11 @@ function PageLayout() {
                     onClick={closeSideBar}
                     className="flex-1 overflow-hidden relative "
                 >
-                    <ChatInterface selectedTheme={selectedTheme}/>
+                    <ChatInterface
+                        selectedTheme={selectedTheme}
+                        messages={messages}
+                        setMessages={setMessages}
+                    />
                 </div>
             </motion.main>
             {openSettings && (
@@ -144,7 +161,7 @@ function PageLayout() {
                                     "Cyberpunk",
                                     "Soft Pastel",
                                     "Sunset Glow",
-                                    "Neural Nexus"
+                                    "Neural Nexus",
                                 ]}
                                 dropDownClass="drop-container"
                                 className="w-[60%] sm:w-[40%]"
@@ -154,7 +171,10 @@ function PageLayout() {
                         </div>
                         <div className="flex items-center justify-between">
                             <p>Delete all Chats</p>
-                            <Button className="px-6 py-2 rounded-3xl bg-red-600 text-white hover:scale-105 transition-all ease-in-out duration-300">
+                            <Button
+                                onClick={deleteChats}
+                                className="px-6 py-2 rounded-3xl bg-red-600 text-white hover:scale-105 transition-all ease-in-out duration-300"
+                            >
                                 Delete all
                             </Button>
                         </div>
