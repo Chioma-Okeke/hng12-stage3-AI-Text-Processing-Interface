@@ -38,6 +38,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
     // const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [detectedLanguage, setDetectedLanguage] = useState("French");
+    const [currentTransLanguage, setCurrentTransLanguage] = useState("");
     const textRef = useRef(null);
     const chatRef = useRef(null);
 
@@ -209,29 +210,35 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                 <div className="flex flex-col sm:flex-row gap-4 items-center">
                                                     <select
                                                         className="select-container focus:outline-none"
-                                                        name=""
-                                                        id=""
+                                                        name="language"
+                                                        id="language-select"
+                                                        defaultValue=""
                                                     >
+                                                        {/* Default placeholder option */}
+                                                        <option
+                                                            value=""
+                                                            disabled
+                                                        >
+                                                            Select Language
+                                                        </option>
+
+                                                        {/* Mapping supported languages */}
                                                         {supportedLanguages.map(
                                                             (
                                                                 language,
                                                                 index
-                                                            ) => {
-                                                                return (
-                                                                    <option
-                                                                        value={
-                                                                            language.value
-                                                                        }
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            language.option
-                                                                        }
-                                                                    </option>
-                                                                );
-                                                            }
+                                                            ) => (
+                                                                <option
+                                                                    value={
+                                                                        language.value
+                                                                    }
+                                                                    key={index}
+                                                                >
+                                                                    {
+                                                                        language.option
+                                                                    }
+                                                                </option>
+                                                            )
                                                         )}
                                                     </select>
                                                     <Button className="action-button">
@@ -274,7 +281,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
 ChatInterface.propTypes = {
     selectedTheme: PropTypes.string,
     messages: PropTypes.array,
-    setMessages: PropTypes.func
+    setMessages: PropTypes.func,
 };
 
 export default ChatInterface;

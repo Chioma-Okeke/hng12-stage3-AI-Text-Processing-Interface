@@ -12,7 +12,12 @@ import Button from "../components/reusables/Button";
 import { applyTheme } from "../utils/theme";
 import { makeCamelCase, removeCamelCase } from "../utils/textConveters";
 import { toast } from "sonner";
-import { clearMessagesDB, getMessagesFromDB, saveMessagesToDB } from "../utils/storage";
+import {
+    clearMessagesDB,
+    getMessagesFromDB,
+    saveMessagesToDB,
+    updateMessagesDB,
+} from "../utils/storage";
 
 const FAQ = [
     {
@@ -42,12 +47,13 @@ const FAQ = [
 ];
 
 function PageLayout() {
-    const [showSideBar, setShowSideBar] = useState(false);
+    const [showSideBar, setShowSideBar] = useState(window.innerWidth > 1024 ? true : false);
     const [openSettings, setOpenSettings] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [selectedTheme, setSelectedTheme] = useState("");
     const [openHelp, setOpenHelp] = useState(false);
     const [messages, setMessages] = useState([]);
+    const [fetchedData, setFetchedData] = useState([]);
     // const [fetchedMessages, setFetchedMessages] = useState([]);
     // console.log(fetchedMessages, "data");
 
@@ -68,6 +74,19 @@ function PageLayout() {
         // fetchData();
     }, []);
 
+    const fetchData = useCallback(async () => {
+        try {
+            const data = await getMessagesFromDB();
+            setFetchedData(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
     const chosenTheme = useCallback((option) => {
         const camelCasedOption = makeCamelCase(option);
         applyTheme(camelCasedOption);
@@ -86,33 +105,49 @@ function PageLayout() {
 
     const deleteChats = async () => {
         try {
-            await clearMessagesDB()
-
+            await clearMessagesDB();
         } catch (error) {
-            console.error(error)
+            console.error(error);
         }
         setOpenSettings(false);
         setIsLocked(false);
     };
 
-    const openNewChat = useCallback(() => {
-        saveMessagesToDB({
-            messages: messages,
-            timeStamp: new Date().toISOString(),
-        })
-            .then(() => {
-                toast.success("Messages successfully saved");
-            })
-            .catch((error) => {
-                console.error("Error saving messages:", error);
-                toast.error("An Error occurred when saving messages");
-            });
-        setMessages([])
-    }, [messages]);
+    const openNewChat = useCallback(async () => {
+        try {
+            const currentChat = localStorage.getItem("currentChat");
+            if (!currentChat) {
+                await saveMessagesToDB({
+                    messages: messages,
+                    timeStamp: new Date().toISOString(),
+                });
+                toast.success("Chat successfully saved");
+            } else {
+                const chat = JSON.parse(currentChat);
+                console.log(chat, "here")
+                const updatedMessages = {
+                    messages: messages,
+                    timeStamp: new Date(),
+                };
+                await updateMessagesDB(chat.id, updatedMessages);
+            toast.success("Chat successfully updated");
+            }
+            localStorage.removeItem("currentChat")
+            await fetchData();
+        } catch (error) {
+            console.error("Error saving messages:", error);
+            toast.error("An Error occurred when saving messages");
+        }
+        setMessages([]);
+    }, [messages, fetchData]);
 
-    const populateChat = useCallback((messages) => {
-        setMessages(messages)
-    })
+    const populateChat = useCallback(
+        async (chat) => {
+            localStorage.setItem("currentChat", JSON.stringify(chat));
+            setMessages(chat.messages);
+        },
+        [setMessages]
+    );
 
     const sidebarWidth = window.innerWidth > 1280 ? "261px" : "";
     return (
@@ -134,7 +169,7 @@ function PageLayout() {
                             setOpenSettings={setOpenSettings}
                             selectedTheme={selectedTheme}
                             populateChat={populateChat}
-                            // fetchData={fetchedMessages}
+                            fetchedData={fetchedData}
                         />
                     </motion.div>
                 )}

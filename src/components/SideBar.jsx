@@ -4,6 +4,8 @@ import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LuCircleHelp } from "react-icons/lu";
 import { getMessagesFromDB } from "../utils/storage";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
+import { is7DaysAgo, isToday, isYesterday } from "../utils/dateUtils";
 // import useThemeSwitcher from "../../../hooks/useThemeSwitcher";
 
 function SideBar({
@@ -12,31 +14,52 @@ function SideBar({
     setOpenSettings,
     setOpenHelp,
     selectedTheme,
-    populateChat
+    populateChat,
+    fetchedData,
 }) {
     // const [openSettings, setOpenSettings] = useState(false);
     // const [isLocked, setIsLocked] = useState(false);
     // const [selectedTheme, setSelectedTheme] = useState("Light");
     // const [openHelp, setOpenHelp] = useState(false);
     // const [theme, setTheme] = useThemeSwitcher();
-    const [fetchedData, setFetchedData] = useState([]);
+    const [todayData, setTodayData] = useState([]);
+    const [yesterdayData, setYesterdayData] = useState([]);
+    const [prev7DaysData, setPrev7DaysData] = useState([]);
+    const [prev30DaysData, setPrev30DaysData] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getMessagesFromDB();
-                setFetchedData(data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
+        if (!fetchedData ) return;
 
-        fetchData();
-    }, []);
+        // clearing state before setting
+        let today = []
+        let yesterday = []
+        let prev7Days = []
+
+        //setting of state
+        fetchedData?.forEach((data) => {
+            if (isToday(data.timeStamp)) {
+                today.push(data)
+            } else if (isYesterday(data.timeStamp)) {
+                yesterday.push(data)
+            } else if (is7DaysAgo(data.timeStamp)) {
+                prev7Days.push(data)
+            } else {
+                console.log("Older:", data);
+            }
+        });
+
+        today.sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp))
+        yesterday.sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp))
+        prev7Days.sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp))
+
+        setTodayData(today)
+        setYesterdayData(yesterday)
+        setPrev7DaysData(prev7Days)
+    }, [fetchedData]);
 
     return (
         <section
-            className={`p-5 pr-10 h-full sidebar ${
+            className={`py-5 px-3 h-full sidebar ${
                 selectedTheme === "Neural Nexus"
                     ? "shadow-[8px_0px_16px_rgba(94,234,212,0.3)]"
                     : " "
@@ -50,23 +73,93 @@ function SideBar({
                     >
                         <HiOutlineMenuAlt1 size={25} />
                     </div>
-                    {/* <span className="text-soft-dark dark:text-primary-light">
-                        Texifyit
-                    </span> */}
                 </div>
                 <div className="flex flex-col justify-between h-full">
-                    <div className="flex flex-col gap-2">
-                        {fetchedData.map((Message, index) => {
-                            return (
-                                <div
-                                    className="cursor-pointer hover:bg-gray-400 transition-colors ease-in-out duration-300 px-1 py-2 rounded-xl"
-                                    key={index}
-                                    onClick={() => populateChat(Message.messages)}
-                                >
-                                    <p>{Message.messages[0].text.slice(0, 25)}</p>
-                                </div>
-                            );
-                        })}
+                    <div className="flex flex-col gap-5">
+                        {todayData.length > 0 && (
+                            <div>
+                                <p className="font-semibold">Today</p>
+                                <ol className="flex flex-col">
+                                    {todayData?.map((Message, index) => {
+                                        return (
+                                            <li
+                                                className="cursor-pointer hover:bg-gray-400 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
+                                                key={index}
+                                                onClick={() =>
+                                                    populateChat(
+                                                        Message
+                                                    )
+                                                }
+                                            >
+                                                <p>
+                                                    {Message.messages[0].text.slice(
+                                                        0,
+                                                        24
+                                                    )}
+                                                </p>
+                                                <HiOutlineDotsHorizontal />
+                                            </li>
+                                        );
+                                    })}
+                                </ol>
+                            </div>
+                        )}
+                        {yesterdayData.length > 0 && (
+                            <div>
+                                <p className="font-semibold">Yesterday</p>
+                                <ol className="flex flex-col">
+                                    {yesterdayData?.map((Message, index) => {
+                                        return (
+                                            <li
+                                                className="cursor-pointer hover:bg-gray-400 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
+                                                key={index}
+                                                onClick={() =>
+                                                    populateChat(
+                                                        Message.messages
+                                                    )
+                                                }
+                                            >
+                                                <p>
+                                                    {Message.messages[0].text.slice(
+                                                        0,
+                                                        24
+                                                    )}
+                                                </p>
+                                                <HiOutlineDotsHorizontal />
+                                            </li>
+                                        );
+                                    })}
+                                </ol>
+                            </div>
+                        )}
+                        {prev7DaysData.length > 0 && (
+                            <div>
+                                <p className="font-semibold">Last 7 Days</p>
+                                <ol className="flex flex-col">
+                                    {prev7DaysData?.map((Message, index) => {
+                                        return (
+                                            <li
+                                                className="cursor-pointer hover:bg-gray-400 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
+                                                key={index}
+                                                onClick={() =>
+                                                    populateChat(
+                                                        Message.messages
+                                                    )
+                                                }
+                                            >
+                                                <p>
+                                                    {Message.messages[0].text.slice(
+                                                        0,
+                                                        24
+                                                    )}
+                                                </p>
+                                                <HiOutlineDotsHorizontal />
+                                            </li>
+                                        );
+                                    })}
+                                </ol>
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center justify-between">
                         <IoSettingsOutline
@@ -95,6 +188,11 @@ function SideBar({
 SideBar.propTypes = {
     handleSideBarToggle: PropTypes.func,
     setShowSideBar: PropTypes.func,
+    setOpenHelp: PropTypes.func,
+    setOpenSettings: PropTypes.func,
+    populateChat: PropTypes.func,
+    fetchedData: PropTypes.array,
+    selectedTheme: PropTypes.string,
 };
 
 export default SideBar;

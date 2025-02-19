@@ -21,30 +21,67 @@ export const openDB = () => {
     });
 };
 
-export const saveMessagesToDB = async (ticketData) => {
+export const saveMessagesToDB = async (messageData) => {
     try {
         const db = await openDB();
         const transaction = db.transaction(STORE_NAME, "readwrite");
         const store = transaction.objectStore(STORE_NAME);
-        store.add(ticketData);
+
+        await store.add(messageData);
+        await transaction.done
+
+        return true
     } catch (error) {
-        console.error("Error saving ticket to IndexedDB:", error);
+        throw new Error(`Error saving messages to IndexedDB: ${error.message}`);
     }
 };
 
 export const getMessagesFromDB = async () => {
     try {
         const db = await openDB();
+        const transaction = db.transaction(STORE_NAME, "readonly");
+        const store = transaction.objectStore(STORE_NAME);
+
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(STORE_NAME, "readonly");
-            const store = transaction.objectStore(STORE_NAME);
             const request = store.getAll();
 
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => resolve(request.result || []);
             request.onerror = () => reject("Error retrieving tickets");
         });
     } catch (error) {
-        console.error("Error retrieving tickets from IndexedDB:", error);
+        throw new Error(`Error fetching chats: ${error.message}`);
+    }
+};
+
+export const updateMessagesDB = async (chatId, updateMessage) => {
+    try {
+        const db = await openDB();
+        const transaction = db.transaction(STORE_NAME, "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
+
+        const existingMessage = await store.get(chatId);
+        console.log(existingMessage, "existing")
+
+        if (!existingMessage) {
+            throw new Error("Chat not found");
+        }
+
+        // const existingData = new Promise((resolve, reject) => {
+        //     const request = store.get(chatId);
+
+        //     request.onsuccess = () => resolve(request.result || []);
+        //     request.onerror = () => reject("Error retrieving tickets");
+        // });
+
+        // console.log(existingData, "existing")
+
+        const updatedData = { ...existingMessage, ...updateMessage, id: chatId };
+        console.log(updatedData, updateMessage, "in db function")
+        await store.put(updatedData);
+
+        await transaction.done;
+    } catch (error) {
+        throw new Error(`Error updating chat: ${error.message}`);
     }
 };
 
@@ -53,38 +90,55 @@ export const clearMessagesDB = async () => {
         const db = await openDB();
         const transaction = db.transaction(STORE_NAME, "readwrite");
         const store = transaction.objectStore(STORE_NAME);
-        store.clear();
+
+        await store.clear();
+        await transaction.done;
+
+        return true;
     } catch (error) {
-        console.error("Error clearing IndexedDB:", error);
+        throw new Error(`Error deleting chat: ${error.message}`);
     }
 };
 
-export const deleteMessage = async (id) => {
+export const deleteMessage = async (chatId) => {
     try {
         const db = await openDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction(STORE_NAME, "readwrite");
-            const store = transaction.objectStore(STORE_NAME);
-            const getRequest = store.get(id);
-            getRequest.onsuccess = () => {
-                if (getRequest.result) {
-                    const deleteRequest = store.delete(id);
-                    deleteRequest.onsuccess = () => resolve(true);
-                    deleteRequest.onerror = () =>
-                        reject("Failed to delete entry.");
-                } else {
-                    resolve(false);
-                }
-            };
+        const transaction = db.transaction(STORE_NAME, "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
 
-            getRequest.onerror = () => reject("Failed to retrieve entry.");
-        });
+        const existingMessage = await store.get(chatId);
+
+        if (!existingMessage) {
+            return false;
+        }
+
+        await store.delete(chatId);
+        await transaction.done;
+
+        return true;
     } catch (error) {
-        console.error("Error deleting entry from IndexedDb:", error);
+        throw new Error(`Error deleting chat: ${error.message}`);
     }
 };
+
+export const isChatExisting = async (chatId) => {
+    try {
+        const db = await openDB();
+        const transaction = db.transaction(STORE_NAME, "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
+
+        const existingMessage = await store.get(chatId);
+
+        if (!existingMessage) {
+            return false;
+        }
+
+        return true
+    } catch (error) {
+        throw new Error(`Error checking chat availability: ${error.message}`);
+    }
+}
 
 export const clearLocalStorage = async () => {
     localStorage.removeItem("CurrentMessages");
-    
 };
