@@ -12,6 +12,7 @@ import Button from "../components/reusables/Button";
 import { applyTheme } from "../utils/theme";
 import { makeCamelCase, removeCamelCase } from "../utils/textConveters";
 import { toast } from "sonner";
+import { clearMessagesDB, getMessagesFromDB, saveMessagesToDB } from "../utils/storage";
 
 const FAQ = [
     {
@@ -47,11 +48,24 @@ function PageLayout() {
     const [selectedTheme, setSelectedTheme] = useState("");
     const [openHelp, setOpenHelp] = useState(false);
     const [messages, setMessages] = useState([]);
+    // const [fetchedMessages, setFetchedMessages] = useState([]);
+    // console.log(fetchedMessages, "data");
 
     useEffect(() => {
         const savedTheme = localStorage.getItem("selectedTheme") || "light";
         applyTheme(savedTheme);
         setSelectedTheme(removeCamelCase(savedTheme));
+
+        // const fetchData = async () => {
+        //     try {
+        //         const data = await getMessagesFromDB();
+        //         setFetchedMessages(data);
+        //     } catch (error) {
+        //         console.error(error);
+        //     }
+        // };
+
+        // fetchData();
     }, []);
 
     const chosenTheme = useCallback((option) => {
@@ -70,16 +84,35 @@ function PageLayout() {
         setShowSideBar((prevState) => !prevState);
     };
 
-    const deleteChats = () => {
-        localStorage.removeItem("currentMessage");
-        const messages = localStorage.getItem("currentMessage");
-        if (messages)
-            return toast.error("An error occurred when deleting messages");
-        toast.success("Messages successfully deleted.");
-        setMessages([]);
+    const deleteChats = async () => {
+        try {
+            await clearMessagesDB()
+
+        } catch (error) {
+            console.error(error)
+        }
         setOpenSettings(false);
         setIsLocked(false);
     };
+
+    const openNewChat = useCallback(() => {
+        saveMessagesToDB({
+            messages: messages,
+            timeStamp: new Date().toISOString(),
+        })
+            .then(() => {
+                toast.success("Messages successfully saved");
+            })
+            .catch((error) => {
+                console.error("Error saving messages:", error);
+                toast.error("An Error occurred when saving messages");
+            });
+        setMessages([])
+    }, [messages]);
+
+    const populateChat = useCallback((messages) => {
+        setMessages(messages)
+    })
 
     const sidebarWidth = window.innerWidth > 1280 ? "261px" : "";
     return (
@@ -100,6 +133,8 @@ function PageLayout() {
                             setOpenHelp={setOpenHelp}
                             setOpenSettings={setOpenSettings}
                             selectedTheme={selectedTheme}
+                            populateChat={populateChat}
+                            // fetchData={fetchedMessages}
                         />
                     </motion.div>
                 )}
@@ -115,6 +150,7 @@ function PageLayout() {
                 <AppHeader
                     showSideBar={showSideBar}
                     setShowSideBar={setShowSideBar}
+                    startNewChat={openNewChat}
                 />
                 <div
                     tabIndex={0}

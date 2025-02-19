@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import TypingMessage from "./reusables/TypingMessage";
 import PropTypes from "prop-types";
 import { toast } from "sonner";
+import AnimatedSection from "./reusables/AnimatedSection";
 
 const supportedLanguages = [
     {
@@ -80,7 +81,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                 return updatedMessages;
             });
             setDetectedLanguage("English");
-            toast.success("Language detection successful")
+            toast.success("Language detection successful");
         } catch (error) {
             console.error(error);
             toast.error("An error occurred while detecting language");
@@ -142,11 +143,13 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                     <div className="absolute inset-0 lg:px-5 pb-5">
                         <div className="py-4 space-y-4 relative h-full">
                             {messages.length === 0 && (
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
-                                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center ">
-                                        Welcome, let&apos;s get started!
-                                    </h1>
-                                </div>
+                                <AnimatedSection>
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
+                                        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center ">
+                                            Welcome, let&apos;s get started!
+                                        </h1>
+                                    </div>
+                                </AnimatedSection>
                             )}
                             {messages?.map((msg) => {
                                 return (
@@ -270,6 +273,8 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
 
 ChatInterface.propTypes = {
     selectedTheme: PropTypes.string,
+    messages: PropTypes.array,
+    setMessages: PropTypes.func
 };
 
 export default ChatInterface;

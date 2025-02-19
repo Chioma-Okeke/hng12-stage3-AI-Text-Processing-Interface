@@ -12,8 +12,8 @@ function AnimatedSection({ children, ...props }) {
     return (
         <motion.div
             ref={ref}
-            initial={{ opacity: 0, y: 50 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.8, ease: "easeOut" }}
             {...props}
         >

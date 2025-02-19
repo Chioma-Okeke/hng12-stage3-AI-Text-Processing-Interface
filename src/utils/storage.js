@@ -21,7 +21,7 @@ export const openDB = () => {
     });
 };
 
-export const saveTicketToDB = async (ticketData) => {
+export const saveMessagesToDB = async (ticketData) => {
     try {
         const db = await openDB();
         const transaction = db.transaction(STORE_NAME, "readwrite");
@@ -32,7 +32,7 @@ export const saveTicketToDB = async (ticketData) => {
     }
 };
 
-export const getTicketsFromDB = async () => {
+export const getMessagesFromDB = async () => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
@@ -48,7 +48,7 @@ export const getTicketsFromDB = async () => {
     }
 };
 
-export const clearTicketsDB = async () => {
+export const clearMessagesDB = async () => {
     try {
         const db = await openDB();
         const transaction = db.transaction(STORE_NAME, "readwrite");
@@ -59,7 +59,7 @@ export const clearTicketsDB = async () => {
     }
 };
 
-export const deleteEntry = async (id) => {
+export const deleteMessage = async (id) => {
     try {
         const db = await openDB();
         return new Promise((resolve, reject) => {
@@ -85,9 +85,6 @@ export const deleteEntry = async (id) => {
 };
 
 export const clearLocalStorage = async () => {
-    localStorage.removeItem("Selected Ticket Details");
-    localStorage.removeItem("formData");
-    localStorage.removeItem("Current section");
-    localStorage.removeItem("TicketSaved");
-    localStorage.removeItem("selectedEvent");
+    localStorage.removeItem("CurrentMessages");
+    
 };
