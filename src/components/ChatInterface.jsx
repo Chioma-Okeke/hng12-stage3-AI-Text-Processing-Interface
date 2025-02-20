@@ -82,6 +82,20 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
     };
 
     const sendMessage = async () => {
+
+        const checkAIConfiguration = () => {
+            return (
+              'summarizer' in window &&
+              'translator' in window &&
+              'detector' in window
+            );
+        };
+
+        if (!checkAIConfiguration()) {
+            toast.error("Your browser does not support the needed built-AI tools");
+            return;
+        }
+
         if (!input.trim()) {
             setIsThereError(true);
             toast.warning("Kindly enter your text in the input field.");
