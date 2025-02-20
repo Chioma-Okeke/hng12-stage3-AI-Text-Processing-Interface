@@ -41,9 +41,9 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
         }
     }, []);
 
-    // useEffect(() => {
-    //     localStorage.setItem("currentMessages", JSON.stringify(messages));
-    // }, [messages]);
+    useEffect(() => {
+        localStorage.setItem("currentMessages", JSON.stringify(messages));
+    }, [messages]);
 
     useEffect(() => {
         if (chatRef.current) {
