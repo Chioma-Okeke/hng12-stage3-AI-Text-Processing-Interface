@@ -32,8 +32,7 @@ An intelligent text processing application leveraging Chrome's AI APIs to provid
 ## Installation & Setup ⚙️
 ```sh
 # Clone the repository
-git clone https://github.com/your-repo/ai-text-processor.git
-cd ai-text-processor
+git clone https://github.com/Chioma-Okeke/hng12-stage3-AI-Text-Processing-Interface.git
 
 # Install dependencies
 yarn install  # or npm install
