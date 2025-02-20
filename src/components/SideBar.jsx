@@ -134,7 +134,7 @@ function SideBar({
                                                         );
                                                     }
                                                 }}
-                                                className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 py-2 rounded-xl flex flex-row items-center justify-between"
+                                                className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
                                                 key={index}
                                                 onClick={() =>
                                                     populateChat(
@@ -175,7 +175,7 @@ function SideBar({
                                                         );
                                                     }
                                                 }}
-                                                className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 py-2 rounded-xl flex flex-row items-center justify-between"
+                                                className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
                                                 key={index}
                                                 onClick={() =>
                                                     populateChat(
