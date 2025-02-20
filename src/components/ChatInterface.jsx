@@ -92,7 +92,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
         };
 
         if (!checkAIConfiguration()) {
-            toast.error("Your browser does not support the needed built-in AI toolsneeded.");
+            toast.error("Your browser does not support the needed built-in AI tools.");
             return;
         }
 
