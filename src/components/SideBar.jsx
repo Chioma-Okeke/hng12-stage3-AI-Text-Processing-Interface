@@ -106,8 +106,10 @@ function SideBar({
                                                 </p>
                                                 <RiDeleteBinLine
                                                     className="hover:scale-110"
-                                                    onClick={() =>
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
                                                         deleteChat(message.id)
+                                                    }
                                                     }
                                                 />
                                             </li>
@@ -150,13 +152,16 @@ function SideBar({
                                                             : 20
                                                     )}
                                                 </p>
-                                                <RiDeleteBinLine className="hover:scale-110" />
+                                                <RiDeleteBinLine className="hover:scale-110" onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    deleteChat(message.id)
+                                                }} />
                                             </li>
                                         );
                                     })}
                                 </ol>
                             </div>
-                        )}
+                        )} 
                         {prev7DaysData.length > 0 && (
                             <div>
                                 <p className="font-semibold p-2">Last 7 Days</p>
@@ -191,7 +196,10 @@ function SideBar({
                                                             : 20
                                                     )}
                                                 </p>
-                                                <RiDeleteBinLine className="hover:scale-110" />
+                                                <RiDeleteBinLine className="hover:scale-110" onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    deleteChat(message.id)
+                                                }}/>
                                             </li>
                                         );
                                     })}
