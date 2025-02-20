@@ -1,11 +1,4 @@
-// import About from "./pages/About";
-// import ContactUs from "./pages/ContactUs";
-// import ErrorPage from "./pages/ErrorPage";
-// import LandingPage from "./pages/Home";
-// import OurServices from "./pages/OurServices";
-// import Outreaches from "./pages/Outreaches";
-// import SkillAcquisitionPage from "./pages/SkillAcquisition";
-import PageLayout from "./pages/PageLayout";
+import Home from "./pages/Home";
 import { Toaster } from "sonner";
 
 import {
@@ -18,7 +11,7 @@ import {
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
-            <Route path="/" element={<PageLayout />} />
+            <Route path="/" element={<Home />} />
         </Route>
     )
 );
@@ -26,18 +19,20 @@ const router = createBrowserRouter(
 function App() {
     return (
         <div>
-            <Toaster
-                position="top-right"
-                toastOptions={{
-                    className: "toast-class",
-                    success: {
-                        className: "success-text"
-                    },
-                    error: {
-                        className: "error-text"
-                    }
-                }}
-            />
+            <div role="alert" aria-live="assertive">
+                <Toaster
+                    position="top-right"
+                    toastOptions={{
+                        className: "toast-class",
+                        success: {
+                            className: "success-text",
+                        },
+                        error: {
+                            className: "error-text",
+                        },
+                    }}
+                />
+            </div>
             <RouterProvider router={router}></RouterProvider>
         </div>
     );

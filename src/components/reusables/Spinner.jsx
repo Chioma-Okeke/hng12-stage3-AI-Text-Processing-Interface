@@ -1,26 +1,17 @@
-import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 
-const Spinner = ({className}) => {
-    const modalRoot = document.getElementById("modal-root");
+const Spinner = ({className, spinnerClass}) => {
 
-    if (!modalRoot) {
-        console.error(
-            "Modal root not found? Make sure to add <div id='modal-root'></div>"
-        );
-        return null;
-    }
-
-    return ReactDOM.createPortal(
-        <div className={`flex items-center justify-center fixed inset-0 w-full h-full z-40 ${className}`}>
-            <div className="w-10 h-10 border-4 border-gray-300 border-t-[#24A0B5] rounded-full animate-spin"></div>
-        </div>,
-        modalRoot
+    return (
+        <div className={`w-full h-full ${className}`}>
+            <div className={`border-4 spinner-color rounded-full animate-spin ${spinnerClass}`}></div>
+        </div>
     );
 };
 
 Spinner.propTypes = {
-    className: PropTypes.string
+    className: PropTypes.string,
+    spinnerClass: PropTypes.string
 }
 
 export default Spinner;

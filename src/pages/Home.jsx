@@ -13,65 +13,29 @@ import { applyTheme } from "../utils/theme";
 import { makeCamelCase, removeCamelCase } from "../utils/textConveters";
 import { toast } from "sonner";
 import {
+    clearLocalStorage,
     clearMessagesDB,
+    deleteMessage,
     getMessagesFromDB,
     saveMessagesToDB,
     updateMessagesDB,
 } from "../utils/storage";
+import { FAQ } from "../data/faq";
 
-const FAQ = [
-    {
-        question: "What is Texifyit?",
-        answer: "Texifyit is a text processing interface that uses AI to help you with your text processing needs.",
-    },
-    {
-        question: "How do I use Texifyit?",
-        answer: "Simply type or paste the text you want to process in the text area and select the processing options you want.",
-    },
-    {
-        question: "What processing options are available?",
-        answer: "Texifyit currently supports text summarization, sentiment analysis, and text translation.",
-    },
-    {
-        question: "How do I change the theme?",
-        answer: "You can change the theme by clicking on the settings icon in the sidebar and selecting the theme you want.",
-    },
-    {
-        question: "Can I delete all chats?",
-        answer: "Yes, you can delete all chats by clicking on the settings icon in the sidebar and selecting the delete all chats option.",
-    },
-    {
-        question: "What languages are supported for translation?",
-        answer: "Texifyit currently supports translation to and from English, Portuguese, French, Spanish, Russian, and Turkish",
-    },
-];
-
-function PageLayout() {
-    const [showSideBar, setShowSideBar] = useState(window.innerWidth > 1024 ? true : false);
+function Home() {
+    const [showSideBar, setShowSideBar] = useState(
+        window.innerWidth > 1280 ? true : false
+    );
     const [openSettings, setOpenSettings] = useState(false);
-    const [isLocked, setIsLocked] = useState(false);
     const [selectedTheme, setSelectedTheme] = useState("");
     const [openHelp, setOpenHelp] = useState(false);
     const [messages, setMessages] = useState([]);
     const [fetchedData, setFetchedData] = useState([]);
-    // const [fetchedMessages, setFetchedMessages] = useState([]);
-    // console.log(fetchedMessages, "data");
 
     useEffect(() => {
         const savedTheme = localStorage.getItem("selectedTheme") || "light";
         applyTheme(savedTheme);
         setSelectedTheme(removeCamelCase(savedTheme));
-
-        // const fetchData = async () => {
-        //     try {
-        //         const data = await getMessagesFromDB();
-        //         setFetchedMessages(data);
-        //     } catch (error) {
-        //         console.error(error);
-        //     }
-        // };
-
-        // fetchData();
     }, []);
 
     const fetchData = useCallback(async () => {
@@ -94,7 +58,7 @@ function PageLayout() {
     }, []);
 
     function closeSideBar() {
-        if (window.innerWidth < 1024 && showSideBar) {
+        if (window.innerWidth < 1280 && showSideBar) {
             setShowSideBar((prevState) => !prevState);
         }
     }
@@ -106,14 +70,33 @@ function PageLayout() {
     const deleteChats = async () => {
         try {
             await clearMessagesDB();
+            toast.success("Chats deleted successfully");
+            await fetchData();
         } catch (error) {
             console.error(error);
         }
+        clearLocalStorage();
+        setMessages([]);
         setOpenSettings(false);
-        setIsLocked(false);
     };
 
+    const deleteChat = useCallback(async (chatId) => {
+        try {
+            await deleteMessage(chatId);
+            toast.success("Chat successfully deleted.");
+            await fetchData();
+        } catch (error) {
+            toast.error(error.message);
+        }
+        clearLocalStorage();
+        setMessages([]);
+    }, []);
+
     const openNewChat = useCallback(async () => {
+        if (messages.length === 0) {
+            toast.info("This is a new chat.");
+            return;
+        }
         try {
             const currentChat = localStorage.getItem("currentChat");
             if (!currentChat) {
@@ -124,15 +107,15 @@ function PageLayout() {
                 toast.success("Chat successfully saved");
             } else {
                 const chat = JSON.parse(currentChat);
-                console.log(chat, "here")
+                console.log(chat, "here");
                 const updatedMessages = {
                     messages: messages,
                     timeStamp: new Date(),
                 };
                 await updateMessagesDB(chat.id, updatedMessages);
-            toast.success("Chat successfully updated");
+                toast.success("Chat successfully updated");
             }
-            localStorage.removeItem("currentChat")
+            localStorage.removeItem("currentChat");
             await fetchData();
         } catch (error) {
             console.error("Error saving messages:", error);
@@ -145,6 +128,9 @@ function PageLayout() {
         async (chat) => {
             localStorage.setItem("currentChat", JSON.stringify(chat));
             setMessages(chat.messages);
+            if (window.innerWidth < 1280) {
+                setShowSideBar(false);
+            }
         },
         [setMessages]
     );
@@ -170,6 +156,7 @@ function PageLayout() {
                             selectedTheme={selectedTheme}
                             populateChat={populateChat}
                             fetchedData={fetchedData}
+                            deleteChat={deleteChat}
                         />
                     </motion.div>
                 )}
@@ -188,6 +175,7 @@ function PageLayout() {
                     startNewChat={openNewChat}
                 />
                 <div
+                    aria-label="chat output area"
                     tabIndex={0}
                     onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -208,20 +196,28 @@ function PageLayout() {
                 <Modal
                     closeModal={() => {
                         setOpenSettings(false);
-                        setIsLocked(false);
                     }}
                 >
                     <div className="modal-container px-5 py-5 md:px-10 rounded-2xl w-[90%] md:w-[70%] max-w-[680px] mx-auto flex flex-col gap-8">
                         <div className="flex items-center justify-between border-b pb-3 border-black">
                             <h1 className="font-bold text-2xl">Settings</h1>
-                            <IoCloseSharp
-                                size={25}
+                            <div
+                                aria-label="Settings close icon"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        setOpenSettings(false);
+                                    }
+                                }}
                                 onClick={() => {
                                     setOpenSettings(false);
-                                    setIsLocked(false);
                                 }}
-                                className="cursor-pointer hover:scale-110 transition-all ease-in-out duration-300"
-                            />
+                            >
+                                <IoCloseSharp
+                                    size={25}
+                                    className="cursor-pointer hover:scale-110 transition-all ease-in-out duration-300"
+                                />
+                            </div>
                         </div>
                         <div className="flex items-center justify-between gap-8">
                             <p className="flex-1">Theme</p>
@@ -256,20 +252,28 @@ function PageLayout() {
                 <Modal
                     closeModal={() => {
                         setOpenHelp(false);
-                        setIsLocked(false);
                     }}
                 >
                     <div className="modal-container py-5 px-5 md:px-10 rounded-[40px] w-[90%] md:w-[70%] max-w-[680px] h-[70%] md:h-auto mx-auto flex flex-col gap-5">
                         <div className="flex items-center justify-between border-b pb-3 border-black">
                             <h1 className="font-bold text-2xl">Help</h1>
-                            <IoCloseSharp
-                                size={25}
+                            <div
+                                aria-label="Help section close icon"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        setOpenHelp(false);
+                                    }
+                                }}
                                 onClick={() => {
                                     setOpenHelp(false);
-                                    setIsLocked(false);
                                 }}
-                                className="cursor-pointer hover:scale-110 transition-all ease-in-out duration-300"
-                            />
+                            >
+                                <IoCloseSharp
+                                    size={25}
+                                    className="cursor-pointer hover:scale-110 transition-all ease-in-out duration-300"
+                                />
+                            </div>
                         </div>
                         <ul className="overflow-y-auto ">
                             {FAQ.map((faq, index) => {
@@ -296,4 +300,4 @@ function PageLayout() {
     );
 }
 
-export default PageLayout;
+export default Home;

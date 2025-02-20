@@ -60,23 +60,12 @@ export const updateMessagesDB = async (chatId, updateMessage) => {
         const store = transaction.objectStore(STORE_NAME);
 
         const existingMessage = await store.get(chatId);
-        console.log(existingMessage, "existing")
 
         if (!existingMessage) {
             throw new Error("Chat not found");
         }
 
-        // const existingData = new Promise((resolve, reject) => {
-        //     const request = store.get(chatId);
-
-        //     request.onsuccess = () => resolve(request.result || []);
-        //     request.onerror = () => reject("Error retrieving tickets");
-        // });
-
-        // console.log(existingData, "existing")
-
         const updatedData = { ...existingMessage, ...updateMessage, id: chatId };
-        console.log(updatedData, updateMessage, "in db function")
         await store.put(updatedData);
 
         await transaction.done;
@@ -141,4 +130,5 @@ export const isChatExisting = async (chatId) => {
 
 export const clearLocalStorage = async () => {
     localStorage.removeItem("CurrentMessages");
+    localStorage.removeItem("currentChat");
 };

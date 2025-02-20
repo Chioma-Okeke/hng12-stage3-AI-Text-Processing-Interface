@@ -1,32 +1,43 @@
-import React from "react";
 import { HiOutlineMenuAlt1 } from "react-icons/hi";
-import editIcon from "../assets/edit.svg";
 import PropTypes from "prop-types";
+import { LiaEditSolid } from "react-icons/lia";
 
 function AppHeader({ showSideBar, setShowSideBar, startNewChat }) {
     return (
         <header className="p-5 w-full header mb-2">
             <div className="flex items-center justify-between">
                 {!showSideBar && (
-                    <HiOutlineMenuAlt1
-                        size={25}
+                    <div
+                        aria-label="menu icon"
+                        tabIndex={0}
+                        onKeyDown={(e) =>
+                            e.key === "Enter" && setShowSideBar(true)
+                        }
                         onClick={() => setShowSideBar(true)}
-                        className="cursor-pointer hover:scale-110 transition-transform ease-in-out duration-300"
-                    />
+                    >
+                        <HiOutlineMenuAlt1
+                            size={25}
+                            className="cursor-pointer hover:scale-110 transition-transform ease-in-out duration-300"
+                        />
+                    </div>
                 )}
                 <h1
+                    aria-label="Logo"
                     className={`logo ${
                         showSideBar ? "flex-1 text-center" : ""
                     }`}
                 >
                     Texifyit
                 </h1>
-                <img
+                <div
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && startNewChat()}
                     onClick={startNewChat}
-                    src={editIcon}
-                    alt="Edit Icon"
+                    aria-label="Edit Icon"
                     className="cursor-pointer"
-                />
+                >
+                    <LiaEditSolid size={25} className="hover:scale-110" />
+                </div>
             </div>
         </header>
     );
