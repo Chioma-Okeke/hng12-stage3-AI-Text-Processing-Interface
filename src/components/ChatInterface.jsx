@@ -116,7 +116,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
         const isAllowed = await checkAIConfiguration();
         if (!isAllowed || isAllowed === "Not Supported") {
             toast.error(
-                "Your browser does not support the needed built-in AI tools."
+                "AI features work best on the desktop version of Chrome."
             );
             return;
         }
@@ -348,6 +348,8 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                         {showCopyIcon ==
                                                             msg.id && (
                                                             <Button
+                                                                type="button"
+                                                                aria-label={`Click to copy ${msg.sender} generated text`}
                                                                 className="absolute top-0 right-0"
                                                                 onClick={(
                                                                     e
@@ -566,6 +568,8 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                                             msg.id
                                                                         ) && (
                                                                     <Button
+                                                                        type="button"
+                                                                        aria-label={`Click to copy ${translation.language} translated text`}
                                                                         onClick={(
                                                                             e
                                                                         ) => {

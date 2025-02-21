@@ -89,6 +89,10 @@ Select.propTypes = {
     numberOfTickets: PropTypes.number,
     setNumberOfTickets: PropTypes.func,
     placeholder: PropTypes.string,
+    selectedOption: PropTypes.string,
+    setSelectedOption: PropTypes.func,
+    dropDownClass: PropTypes.string,
+    className: PropTypes.string,
 };
 
 export default Select;

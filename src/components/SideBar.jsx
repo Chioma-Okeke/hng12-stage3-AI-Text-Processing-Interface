@@ -271,6 +271,10 @@ SideBar.propTypes = {
     fetchedData: PropTypes.array,
     selectedTheme: PropTypes.string,
     deleteChat: PropTypes.func,
+    historyRef: PropTypes.element,
+    settingsRef: PropTypes.element,
+    helpRef: PropTypes.element,
+    activeRef: PropTypes.element
 };
 
 export default SideBar;

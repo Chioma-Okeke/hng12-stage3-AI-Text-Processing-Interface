@@ -52,7 +52,11 @@ const TourModal = ({
         return null;
     }
     return ReactDOM.createPortal(
-        <div className="bg-black/20 fixed inset-0 w-full h-full z-50">
+        <div
+            tabIndex={0}
+            aria-label="Tour guide dialog"
+            className="bg-black/20 fixed inset-0 w-full h-full z-50"
+        >
             <div
                 className={`${
                     refElement === containerRef
@@ -65,15 +69,27 @@ const TourModal = ({
                     left: position.left,
                 }}
             >
-               <div className="text-center">
-                {refElement === containerRef && <h1 className="logo">Welcome to Texifyit</h1>}
-                <p className="text-[#141414]">{description}</p>
-               </div>
+                <div className="text-center">
+                    {refElement === containerRef && (
+                        <h1 className="logo">Welcome to Texifyit</h1>
+                    )}
+                    <p className="text-[#141414]">{description}</p>
+                </div>
                 <div className="flex items-center gap-4 justify-center">
-                    <Button className="action-button " onClick={onNext}>
+                    <Button
+                        type="button"
+                        aria-label="Click to move to the next step"
+                        className="action-button "
+                        onClick={onNext}
+                    >
                         Next
                     </Button>
-                    <Button className="action-button " onClick={onSkip}>
+                    <Button
+                        type="button"
+                        aria-label="Click to move to skip tour guide"
+                        className="action-button "
+                        onClick={onSkip}
+                    >
                         Skip
                     </Button>
                 </div>
