@@ -15,6 +15,9 @@ function SideBar({
     populateChat,
     fetchedData,
     deleteChat,
+    historyRef,
+    settingsRef,
+    helpRef,
 }) {
     const [todayData, setTodayData] = useState([]);
     const [yesterdayData, setYesterdayData] = useState([]);
@@ -71,10 +74,10 @@ function SideBar({
                     </div>
                 </div>
                 <div className="flex flex-col justify-between h-full">
-                    <div className="flex flex-col gap-5">
+                    <div ref={historyRef} className="flex flex-col gap-5">
                         {todayData.length > 0 && (
                             <div>
-                                <p className="font-semibold p-2">Today</p>
+                                <p className="font-semibold px-2">Today</p>
                                 <ol className="flex flex-col">
                                     {todayData?.map((message, index) => {
                                         return (
@@ -85,9 +88,7 @@ function SideBar({
                                                         e.key === "Enter" ||
                                                         e.key === " "
                                                     ) {
-                                                        populateChat(
-                                                            message
-                                                        );
+                                                        populateChat(message);
                                                     }
                                                 }}
                                                 className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
@@ -120,7 +121,7 @@ function SideBar({
                         )}
                         {yesterdayData.length > 0 && (
                             <div>
-                                <p className="font-semibold p-2">Yesterday</p>
+                                <p className="font-semibold px-2">Yesterday</p>
                                 <ol className="flex flex-col">
                                     {yesterdayData?.map((message, index) => {
                                         return (
@@ -131,9 +132,7 @@ function SideBar({
                                                         e.key === "Enter" ||
                                                         e.key === " "
                                                     ) {
-                                                        populateChat(
-                                                            message
-                                                        );
+                                                        populateChat(message);
                                                     }
                                                 }}
                                                 className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
@@ -164,7 +163,7 @@ function SideBar({
                         )} 
                         {prev7DaysData.length > 0 && (
                             <div>
-                                <p className="font-semibold p-2">Last 7 Days</p>
+                                <p className="font-semibold px-2">Last 7 Days</p>
                                 <ol className="flex flex-col">
                                     {prev7DaysData?.map((message, index) => {
                                         return (
@@ -175,9 +174,7 @@ function SideBar({
                                                         e.key === "Enter" ||
                                                         e.key === " "
                                                     ) {
-                                                        populateChat(
-                                                            message
-                                                        );
+                                                        populateChat(message);
                                                     }
                                                 }}
                                                 className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
@@ -209,6 +206,7 @@ function SideBar({
                     </div>
                     <div className="flex items-center justify-between">
                         <div
+                            ref={settingsRef}
                             aria-label="settings icon"
                             tabIndex={0}
                             onKeyDown={(e) => {
@@ -228,6 +226,7 @@ function SideBar({
                             />
                         </div>
                         <div
+                            ref={helpRef}
                             aria-label="help icon"
                             tabIndex={0}
                             onKeyDown={(e) => {
