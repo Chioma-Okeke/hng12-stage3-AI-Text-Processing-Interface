@@ -76,7 +76,7 @@ function SideBar({
                 </div>
                 <div className="flex flex-col justify-between h-full">
                     <div ref={historyRef}
-                            className={`flex flex-col gap-5 ${
+                            className={`flex flex-col gap-5 overflow-y-auto custom-scrollbar ${
                                 activeRef === historyRef ? "active" : ""
                             }`}>
                         {todayData.length > 0 && (
