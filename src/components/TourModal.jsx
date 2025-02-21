@@ -65,12 +65,15 @@ const TourModal = ({
                     left: position.left,
                 }}
             >
-                <p className="text-center">{description}</p>
+               <div className="text-center">
+                {refElement === containerRef && <h1 className="logo">Welcome to Texifyit</h1>}
+                <p className="text-[#141414]">{description}</p>
+               </div>
                 <div className="flex items-center gap-4 justify-center">
-                    <Button className="action-button" onClick={onNext}>
+                    <Button className="action-button " onClick={onNext}>
                         Next
                     </Button>
-                    <Button className="action-button" onClick={onSkip}>
+                    <Button className="action-button " onClick={onSkip}>
                         Skip
                     </Button>
                 </div>

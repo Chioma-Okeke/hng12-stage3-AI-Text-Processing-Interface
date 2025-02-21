@@ -35,7 +35,8 @@ function Home() {
     const [currentStep, setCurrentStep] = useState(0);
     const [activeRef, setActiveRef] = useState(null);
     const [isTourActive, setIsTourActive] = useState(
-        !localStorage.getItem("oldUser")
+        !localStorage.getItem("oldUser") ||
+            JSON.parse(localStorage.getItem("pendingOnboarding"))
     );
     const newChatRef = useRef(null);
     const historyRef = useRef(null);
@@ -47,7 +48,7 @@ function Home() {
         {
             ref: chatRef,
             description:
-                "Welcome to Texifyit. An application where you can translate, detect the language of and summarize your texts",
+                "An application where you can translate, detect the language of and summarize your long texts",
         },
         {
             ref: newChatRef,
@@ -75,12 +76,13 @@ function Home() {
             setActiveRef(null);
             setIsTourActive(false);
             localStorage.setItem("oldUser", true);
+            localStorage.setItem("pendingOnboarding", false);
         }
     };
 
     const handleSkip = () => {
         setIsTourActive(false);
-        localStorage.setItem("oldUser", true);
+        localStorage.setItem("pendingOnboarding", true);
     };
 
     useEffect(() => {

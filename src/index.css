@@ -117,6 +117,7 @@ body, .header, .drop-container {
 .tour-container {
   border: 2px solid var(--sidebar-border-color);
   border-radius: 24px;
+  /* color: #141414; */
 }
 
 .active {
