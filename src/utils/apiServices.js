@@ -5,6 +5,21 @@ let cachedCapabilities = {
     summarizer: null,
 };
 
+const languageMap = {
+    English: "en",
+    French: "fr",
+    Portuguese: "pt",
+    Spanish: "es",
+    Turkish: "tr",
+    Russian: "ru",
+    en: "English",
+    fr: "French",
+    pt: "Portuguese",
+    es: "Spanish",
+    tr: "Turkish",
+    ru: "Russian",
+};
+
 // Check if all AI features are properly configured and available
 export const checkAIConfiguration = async () => {
     try {
@@ -53,7 +68,7 @@ export const detectLanguage = async (message) => {
 
     if (capabilities.capabilities === "no") {
         throw new Error(
-            "Language detection not available. Chrome AI needs configuration."
+            "Language detection is not available at the moment."
         );
     }
 
@@ -66,15 +81,6 @@ export const detectLanguage = async (message) => {
 
         const results = await detector.detect(message);
         const result = results[0];
-
-        const languageMap = {
-            en: "English",
-            fr: "French",
-            pt: "Portuguese",
-            es: "Spanish",
-            tr: "Turkish",
-            ru: "Russian",
-        };
 
         return (
             languageMap[result.detectedLanguage] ||
@@ -99,14 +105,7 @@ export const textTranslation = async (
         throw new Error("Translator API not supported in this browser");
     }
 
-    const languageMap = {
-        English: "en",
-        French: "fr",
-        Portuguese: "pt",
-        Spanish: "es",
-        Turkish: "tr",
-        Russian: "ru",
-    };
+    
 
     const incomingLanguage = languageMap[userMessage.detectedLanguage];
     if (!incomingLanguage) {
@@ -123,7 +122,7 @@ export const textTranslation = async (
 
     if (pairAvailable === "no") {
         throw new Error(
-            `Translation from ${incomingLanguage} to ${expectedResponseLanguage} not available`
+            `Translation from ${userMessage.detectedLanguage} to ${languageMap[expectedResponseLanguage]} not available`
         );
     }
 
@@ -155,7 +154,7 @@ export const textSummarization = async (message) => {
 
     if (capabilities.available === "no") {
         throw new Error(
-            "Summarizer not available. Chrome AI needs configuration."
+            "Summarizer not available at the moment."
         );
     }
 
