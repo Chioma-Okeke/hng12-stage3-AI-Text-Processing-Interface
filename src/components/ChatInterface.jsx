@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import AnimatedSection from "./reusables/AnimatedSection";
 import { IoLanguageSharp } from "react-icons/io5";
 import { FaBahai } from "react-icons/fa";
+import { FaRegCopy } from "react-icons/fa";
 import {
     checkAIConfiguration,
     detectLanguage,
@@ -31,6 +32,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
     const chatRef = useRef(null);
     const lastTranslationRef = useRef(null);
     const prevTranslationsCountRef = useRef({});
+    const [showCopyIcon, setShowCopyIcon] = useState("");
 
     useEffect(() => {
         const savedMessages = localStorage.getItem("currentMessages");
@@ -156,7 +158,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                     const updatedMessages = [...prev];
                     updatedMessages[indexOfAIResponse] = {
                         ...updatedMessages[indexOfAIResponse],
-                        text: summarizedText
+                        text: summarizedText,
                     };
                     return updatedMessages;
                 });
@@ -170,12 +172,12 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                     sender: "AI",
                     summarizedId: message.id,
                 };
-                const updatedMessages = [...prev]
-                const index = message.id
+                const updatedMessages = [...prev];
+                const index = message.id;
 
-                updatedMessages.splice(index, 0, newMessage)
-                return updatedMessages
-        });
+                updatedMessages.splice(index, 0, newMessage);
+                return updatedMessages;
+            });
             toast.success("Summarized text Successfully");
         } catch (error) {
             toast.error(error.message);
@@ -259,6 +261,16 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
         textarea.style.height = textarea.scrollHeight + "px";
     }
 
+    async function copyToClipboard(text) {
+        try {
+            console.log("working");
+            await navigator.clipboard.writeText(text);
+            toast.success("Copied to clipboard!");
+        } catch (err) {
+            toast.error("Failed to copy");
+        }
+    }
+
     return (
         <div className="absolute inset-0 flex flex-col max-h-[calc(100vh - 65px)] text-sm md:text-base">
             <div className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
@@ -307,14 +319,25 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                         : ""
                                                 }`}
                                             >
-                                                {isSummarizationInProgress === msg.id && (
+                                                {isSummarizationInProgress ===
+                                                    msg.id && (
                                                     <Spinner
                                                         spinnerClass="w-6 h-6"
                                                         className="pb-2"
                                                     />
                                                 )}
                                                 {msg.sender === "AI" ? (
-                                                    <>
+                                                    <div
+                                                        className="relative"
+                                                        onMouseEnter={() => {
+                                                            setShowCopyIcon(
+                                                                msg.id
+                                                            );
+                                                        }}
+                                                        onMouseLeave={() => {
+                                                            setShowCopyIcon("");
+                                                        }}
+                                                    >
                                                         <div className="ai-icon mb-2">
                                                             <FaBahai
                                                                 size={20}
@@ -323,7 +346,26 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                         <TypingMessage
                                                             text={msg.text}
                                                         />
-                                                    </>
+                                                        {showCopyIcon ==
+                                                            msg.id && (
+                                                            <Button
+                                                                className="z-40"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    copyToClipboard(
+                                                                        msg.text
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <FaRegCopy
+                                                                    size={20}
+                                                                    className="absolute top-0 right-0 cursor-pointer hover:scale-110"
+                                                                />
+                                                            </Button>
+                                                        )}
+                                                    </div>
                                                 ) : (
                                                     msg.text
                                                 )}
@@ -467,15 +509,34 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                                 1;
                                                         return (
                                                             <div
+                                                                onMouseEnter={() => {
+                                                                    console.log(
+                                                                        translation.language +
+                                                                            String(
+                                                                                msg.id
+                                                                            )
+                                                                    );
+                                                                    setShowCopyIcon(
+                                                                        translation.language +
+                                                                            String(
+                                                                                msg.id
+                                                                            )
+                                                                    );
+                                                                }}
+                                                                onMouseLeave={() => {
+                                                                    setShowCopyIcon(
+                                                                        ""
+                                                                    );
+                                                                }}
                                                                 ref={
                                                                     isLastTranslation
                                                                         ? lastTranslationRef
                                                                         : null
                                                                 }
                                                                 tabIndex={0}
-                                                                aria-label={`${translation.language} translation`}
                                                                 key={index}
-                                                                className="translation-response p-2 rounded-xl flex flex-col gap-2 max-w-[256px] md:w-[400px] sm:max-w-sm mr-auto"
+                                                                aria-label={`${translation.language} translation`}
+                                                                className="relative translation-response p-2 rounded-xl flex flex-col gap-2 max-w-[256px] md:w-[400px] sm:max-w-sm mr-auto"
                                                             >
                                                                 <p className="font-semibold">
                                                                     {
@@ -506,6 +567,29 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                                         }
                                                                     />
                                                                 </p>
+                                                                {showCopyIcon ==
+                                                                    translation.language +
+                                                                        String(
+                                                                            msg.id
+                                                                        ) && (
+                                                                    <Button
+                                                                        onClick={(
+                                                                            e
+                                                                        ) => {
+                                                                            e.stopPropagation();
+                                                                            copyToClipboard(
+                                                                                translation.result
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <FaRegCopy
+                                                                            size={
+                                                                                20
+                                                                            }
+                                                                            className="absolute top-0 -right-5 cursor-pointer hover:scale-110"
+                                                                        />
+                                                                    </Button>
+                                                                )}
                                                             </div>
                                                         );
                                                     }
