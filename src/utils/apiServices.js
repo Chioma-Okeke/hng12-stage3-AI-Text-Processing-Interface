@@ -1,96 +1,152 @@
+// Cache for capabilities to avoid repeated API calls
+let cachedCapabilities = {
+    languageDetector: null,
+    translator: null,
+    summarizer: null,
+};
+
+// Check if all AI features are properly configured and available
 export const checkAIConfiguration = async () => {
     try {
-        const languageDetectorCapabilities =
-            await self.ai.languageDetector.capabilities();
-        const canDetect = languageDetectorCapabilities.capabilities;
-        if ("ai" in self && "translator" in self.ai) {
-            console.log("The Translator API is supported.");
+        // Check if the AI object exists in the global scope
+        if (!("ai" in self)) {
+            console.log("Chrome AI API not available");
+            return false;
         }
-        const available = (await self.ai.summarizer.capabilities()).available;
 
-        return(
-            canDetect === "no" &&
-                "ai" in self &&
-                "translator" in self.ai &&
-                available === "no"
+        // Get capabilities for all services (using cache when possible)
+        const ldCapabilities = await getLanguageDetectorCapabilities();
+        const translatorAvailable = "translator" in self.ai;
+        const summarizerCapabilities = await getSummarizerCapabilities();
+
+        // Return true only if all services are available
+        return (
+            ldCapabilities.available === "readily" &&
+            translatorAvailable &&
+            summarizerCapabilities.available === "readily"
         );
     } catch (error) {
-        console.log(error)
-        return "Not Supported"
+        console.error("Error checking AI configuration:", error);
+        return false;
     }
 };
+
+// Cache and retrieve language detector capabilities
+async function getLanguageDetectorCapabilities() {
+    if (cachedCapabilities.languageDetector === null) {
+        cachedCapabilities.languageDetector =
+            await self.ai.languageDetector.capabilities();
+    }
+    return cachedCapabilities.languageDetector;
+}
+
+// Cache and retrieve summarizer capabilities
+async function getSummarizerCapabilities() {
+    if (cachedCapabilities.summarizer === null) {
+        cachedCapabilities.summarizer = await self.ai.summarizer.capabilities();
+    }
+    return cachedCapabilities.summarizer;
+}
+
 
 export const detectLanguage = async (message) => {
-    const languageDetectorCapabilities =
-        await self.ai.languageDetector.capabilities();
-    const canDetect = languageDetectorCapabilities.capabilities;
-    let detector;
-    if (canDetect === "no") {
+    const capabilities = await getLanguageDetectorCapabilities();
+
+    if (capabilities.capabilities === "no") {
         throw new Error(
-            "To use this application you need to have the Chrome built-in AI configured on your device"
+            "Language detection not available. Chrome AI needs configuration."
         );
     }
-    if (canDetect === "readily") {
-        // The language detector can immediately be used.
-        detector = await self.ai.languageDetector.create();
-    } else {
-        // The language detector can be used after model download.
-        detector = await self.ai.languageDetector.create();
-        await detector.ready;
-    }
-    const results = await detector.detect(message);
-    const result = results[0];
-    const languageMap = {
-        en: "English",
-        fr: "French",
-        pt: "Portuguese",
-        es: "Spanish",
-        tr: "Turkish",
-        ru: "Russian",
-    };
 
-    return (
-        languageMap[result.detectedLanguage] || "beyond our language database"
-    );
+    let detector = null;
+    try {
+        detector = await self.ai.languageDetector.create();
+        if (capabilities.capabilities === "after-download") {
+            await detector.ready;
+        }
+
+        const results = await detector.detect(message);
+        const result = results[0];
+
+        const languageMap = {
+            en: "English",
+            fr: "French",
+            pt: "Portuguese",
+            es: "Spanish",
+            tr: "Turkish",
+            ru: "Russian",
+        };
+
+        return (
+            languageMap[result.detectedLanguage] ||
+            "beyond our language database"
+        );
+    } finally {
+        // Clean up resources
+        if (detector) {
+            detector.destroy?.();
+        }
+    }
 };
 
-export const textTranslation = async (
-    userMessage,
-    expectedResponseLanguage
-) => {
-    if ("ai" in self && "translator" in self.ai) {
-        console.log("The Translator API is supported.");
+export const textTranslation = async (userMessage, expectedResponseLanguage) => {
+    if (!('ai' in self) || !('translator' in self.ai)) {
+      throw new Error("Translator API not supported in this browser");
     }
+    
     const languageMap = {
-        English: "en",
-        French: "fr",
-        Portuguese: "pt",
-        Spanish: "es",
-        Turkish: "tr",
-        Russian: "ru",
+      English: "en",
+      French: "fr",
+      Portuguese: "pt",
+      Spanish: "es",
+      Turkish: "tr",
+      Russian: "ru",
     };
+    
     const incomingLanguage = languageMap[userMessage.detectedLanguage];
-    const translatorCapabilities = await self.ai.translator.capabilities();
-    const request = translatorCapabilities.languagePairAvailable(
-        incomingLanguage,
-        expectedResponseLanguage
-    );
-
-    if (request === "no") {
-        throw new Error(
-            "To use this application you need to have the Chrome built-in AI configured on your device"
-        );
+    if (!incomingLanguage) {
+      throw new Error(`Unsupported source language: ${userMessage.detectedLanguage}`);
     }
-    const translator = await self.ai.translator.create({
+    
+    const translatorCapabilities = await self.ai.translator.capabilities();
+    const pairAvailable = translatorCapabilities.languagePairAvailable(
+      incomingLanguage,
+      expectedResponseLanguage
+    );
+  
+    if (pairAvailable === "no") {
+      throw new Error(`Translation from ${incomingLanguage} to ${expectedResponseLanguage} not available`);
+    }
+    
+    let translator = null;
+    try {
+      translator = await self.ai.translator.create({
         sourceLanguage: incomingLanguage,
         targetLanguage: expectedResponseLanguage,
-    });
+      });
 
-    const response = await translator.translate(userMessage.text);
-    return response;
-};
+      if (pairAvailable === "after-download") {
+        await translator.ready;
+      }
+      
+      return await translator.translate(userMessage.text);
+    } finally {
+      // Clean up resources
+      if (translator) {
+        translator.destroy?.();
+      }
+    }
+  };
 
 export const textSummarization = async (message) => {
+    const capabilities = await getSummarizerCapabilities();
+
+    if (capabilities.available === "no") {
+        throw new Error(
+            "Summarizer not available. Chrome AI needs configuration."
+        );
+    }
+
     const options = {
         sharedContext: "This is a scientific article",
         type: "tl;dr",
@@ -98,22 +154,27 @@ export const textSummarization = async (message) => {
         length: "short",
     };
 
-    const available = (await self.ai.summarizer.capabilities()).available;
-    let summarizer;
-    if (available === "no") {
-        throw new Error(
-            "To use this application you need to have the Chrome built-in AI configured on your device"
-        );
-    }
-    if (available === "readily") {
+    let summarizer = null;
+    try {
         summarizer = await self.ai.summarizer.create(options);
-    } else {
-        summarizer = await self.ai.summarizer.create(options);
-        summarizer.addEventListener("downloadprogress", (e) => {
-            console.log(e.loaded, e.total);
-        });
-        await summarizer.ready;
+        console.log(summarizer, "??")
+        if (capabilities.available === "after-download") {
+            console.log("i am inside here")
+            summarizer.addEventListener("downloadprogress", (e) => {
+                console.log(
+                    `Downloading summarizer model: ${Math.round(
+                        (e.loaded / e.total) * 100
+                    )}%`
+                );
+            });
+            await summarizer.ready;
+        }
+        console.log("...processing")
+        return await summarizer.summarize(message);
+    } finally {
+        // Clean up resources
+        if (summarizer) {
+            summarizer.destroy?.();
+        }
     }
-    const summary = await summarizer.summarize(message);
-    return summary;
 };

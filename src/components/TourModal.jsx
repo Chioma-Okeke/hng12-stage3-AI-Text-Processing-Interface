@@ -18,7 +18,6 @@ const TourModal = ({
         const updatePosition = () => {
             if (refElement?.current) {
                 const rect = refElement.current.getBoundingClientRect();
-                console.log(rect, window.innerHeight, window.innerWidth);
                 setPosition({
                     top:
                         refElement === containerRef

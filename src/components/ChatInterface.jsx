@@ -16,16 +16,20 @@ import {
 import Spinner from "./reusables/Spinner";
 import { supportedLanguages } from "../data/languages";
 
-function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
+function ChatInterface({ selectedTheme, setMessages, messages }) {
     const [input, setInput] = useState("");
     const [targetLanguage, setTargetLanguage] = useState("");
     const [errorOn, setErrorOn] = useState("");
     const [isThereError, setIsThereError] = useState(false);
     const [currentId, setCurrentId] = useState("");
     const textRef = useRef(null);
-    const chatRef = useRef(null);
     const [isSummarizationInProgress, setIsSummarizationInProgress] =
         useState(false);
+    const [isTranslationInProgress, setIsTranslationInProgress] =
+        useState(false);
+    const chatRef = useRef(null);
+    const lastTranslationRef = useRef(null);
+    const prevTranslationsCountRef = useRef({});
 
     useEffect(() => {
         const savedMessages = localStorage.getItem("currentMessages");
@@ -47,10 +51,33 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
     }, [messages]);
 
     useEffect(() => {
-        if (chatRef.current) {
-            chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        if (chatRef.current && messages.length > 0) {
+            setTimeout(() => {
+                chatRef.current.scrollTop = chatRef.current.scrollHeight;
+            }, 100);
         }
-    });
+    }, [messages.length]);
+
+    useEffect(() => {
+        messages.forEach((msg) => {
+            const currentTranslationsCount = msg.translations?.length || 0;
+            const prevCount = prevTranslationsCountRef.current[msg.id] || 0;
+
+            if (
+                currentTranslationsCount > prevCount &&
+                lastTranslationRef.current
+            ) {
+                prevTranslationsCountRef.current[msg.id] =
+                    currentTranslationsCount;
+                setTimeout(() => {
+                    lastTranslationRef.current.scrollIntoView({
+                        behavior: "smooth",
+                        block: "nearest",
+                    });
+                }, 200);
+            }
+        });
+    }, [messages]);
 
     useEffect(() => {
         localStorage.setItem("currentMessages", JSON.stringify(messages));
@@ -83,10 +110,11 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
     };
 
     const sendMessage = async () => {
-        const isAllowed = await checkAIConfiguration()
-        console.log(isAllowed)
-        if (isAllowed || isAllowed === "Not Supported") {
-            toast.error("Your browser does not support the needed built-in AI tools.");
+        const isAllowed = await checkAIConfiguration();
+        if (!isAllowed || isAllowed === "Not Supported") {
+            toast.error(
+                "Your browser does not support the needed built-in AI tools."
+            );
             return;
         }
 
@@ -117,6 +145,7 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
             return;
         }
         try {
+            console.log("I started");
             setIsSummarizationInProgress(true);
             const summarizedText = await textSummarization(message.text);
             const indexOfAIResponse = messages.findIndex(
@@ -187,6 +216,7 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
         }
 
         try {
+            setIsTranslationInProgress(true);
             const response = await textTranslation(message, targetLanguage);
             const translation = {
                 language: languageMap[targetLanguage],
@@ -215,6 +245,8 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
             toast.error(error.message);
             setErrorOn("");
             console.error("Translation error:", error);
+        } finally {
+            setIsTranslationInProgress(false);
         }
     };
 
@@ -225,8 +257,11 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
 
     return (
         <div className="absolute inset-0 flex flex-col max-h-[calc(100vh - 65px)] text-sm md:text-base">
-            <div ref={containerRef} className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
-                <div className="flex-1 overflow-y-auto min-h-0 relative mb-24">
+            <div className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
+                <div
+                    ref={chatRef}
+                    className="flex-1 overflow-y-auto min-h-0 relative mb-24"
+                >
                     <div className="absolute inset-0 lg:px-5 pb-5">
                         <div className="py-4 space-y-4 relative h-full">
                             {messages?.length === 0 && (
@@ -268,14 +303,14 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
                                                         : ""
                                                 }`}
                                             >
+                                                {isSummarizationInProgress && (
+                                                    <Spinner
+                                                        spinnerClass="w-6 h-6"
+                                                        className="pb-2"
+                                                    />
+                                                )}
                                                 {msg.sender === "AI" ? (
                                                     <>
-                                                        {!isSummarizationInProgress && (
-                                                            <Spinner
-                                                                spinnerClass="w-6 h-6"
-                                                                className="pb-2"
-                                                            />
-                                                        )}
                                                         <TypingMessage
                                                             text={msg.text}
                                                         />
@@ -407,10 +442,27 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
                                         )}
                                         {
                                             <div className="flex flex-col gap-4 mt-4">
+                                                {isTranslationInProgress &&
+                                                    currentId === msg.id && (
+                                                        <Spinner
+                                                            spinnerClass="w-6 h-6"
+                                                            className="pb-2"
+                                                        />
+                                                    )}
                                                 {msg.translations?.map(
                                                     (translation, index) => {
+                                                        const isLastTranslation =
+                                                            index ===
+                                                            msg.translations
+                                                                .length -
+                                                                1;
                                                         return (
                                                             <div
+                                                                ref={
+                                                                    isLastTranslation
+                                                                        ? lastTranslationRef
+                                                                        : null
+                                                                }
                                                                 tabIndex={0}
                                                                 aria-label={`${translation.language} translation`}
                                                                 key={index}
@@ -425,6 +477,23 @@ function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
                                                                     <TypingMessage
                                                                         text={
                                                                             translation.result
+                                                                        }
+                                                                        onComplete={
+                                                                            isLastTranslation
+                                                                                ? () => {
+                                                                                      if (
+                                                                                          lastTranslationRef.current
+                                                                                      ) {
+                                                                                          lastTranslationRef.current.scrollIntoView(
+                                                                                              {
+                                                                                                  behavior:
+                                                                                                      "smooth",
+                                                                                                  block: "nearest",
+                                                                                              }
+                                                                                          );
+                                                                                      }
+                                                                                  }
+                                                                                : undefined
                                                                         }
                                                                     />
                                                                 </p>

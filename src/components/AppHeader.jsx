@@ -9,7 +9,6 @@ function AppHeader({
     newChatRef,
     activeRef,
 }) {
-    console.log(activeRef, "ref")
     return (
         <header className="p-5 w-full header mb-2">
             <div className="flex items-center justify-between">
@@ -57,6 +56,8 @@ AppHeader.propTypes = {
     showSideBar: PropTypes.bool,
     setShowSideBar: PropTypes.func,
     startNewChat: PropTypes.func,
+    newChatRef: PropTypes.element,
+    activeRef: PropTypes.element,
 };
 
 export default AppHeader;

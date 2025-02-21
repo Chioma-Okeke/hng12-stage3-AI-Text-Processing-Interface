@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 
-const useTypingEffect = (text, speed = 50) => {
+const useTypingEffect = (text, speed = 50, onComplete) => {
     const [displayedText, setDisplayedText] = useState("");
     const [showCursor, setShowCursor] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
-        setDisplayedText(""); // Reset text when input changes
-        setCurrentIndex(0); // Reset index
-        if (!text) return;
+        setDisplayedText("");
+        setCurrentIndex(0);
+        if (!text) {
+            if (onComplete) onComplete();
+            return;
+        }
 
         const interval = setInterval(() => {
             setCurrentIndex((prev) => {
@@ -17,6 +20,8 @@ const useTypingEffect = (text, speed = 50) => {
                     return prev + 1;
                 } else {
                     clearInterval(interval);
+
+                    if (onComplete) onComplete();
                     return prev;
                 }
             });
@@ -25,10 +30,9 @@ const useTypingEffect = (text, speed = 50) => {
         return () => clearInterval(interval);
     }, [text, speed]);
 
-    // Blinking cursor effect
     useEffect(() => {
         if (currentIndex === text.length) {
-            setShowCursor(false); // Stop cursor when typing is done
+            setShowCursor(false);
             return;
         }
 
