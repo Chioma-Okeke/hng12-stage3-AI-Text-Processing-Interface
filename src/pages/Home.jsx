@@ -72,6 +72,7 @@ function Home() {
         if (currentStep < steps.length - 1) {
             setCurrentStep((prev) => prev + 1);
         } else {
+            setActiveRef(null);
             setIsTourActive(false);
         }
     };
