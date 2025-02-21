@@ -261,7 +261,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
             <div className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
                 <div
                     ref={chatRef}
-                    className="flex-1 overflow-y-auto min-h-0 relative mb-24 chat-scroll"
+                    className="flex-1 overflow-y-auto min-h-0 relative mb-24 custom-scrollbar"
                 >
                     <div className="absolute inset-0 lg:px-5 pb-5">
                         <div className="py-4 space-y-4 relative h-full">

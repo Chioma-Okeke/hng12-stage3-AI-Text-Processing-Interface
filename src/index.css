@@ -126,10 +126,22 @@ body, .header, .drop-container {
 }
 
 .ai-icon {
-  color: var(--chat-bubble);
+  color: rgba(var(--chat-bubble));
 }
 
+.custom-scrollbar {
+  scrollbar-color: rgba(var(--chat-bubble), 0.9) var(--bg-color);
+}
 
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(var(--chat-bubble));
+  border-radius: 10px;
+}
 
 @media (max-width: 640px) {
   .logo {
