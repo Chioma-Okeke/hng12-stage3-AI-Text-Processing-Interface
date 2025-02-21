@@ -74,6 +74,7 @@ function Home() {
         } else {
             setActiveRef(null);
             setIsTourActive(false);
+            localStorage.setItem("oldUser", true);
         }
     };
 
