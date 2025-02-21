@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import { toast } from "sonner";
 import AnimatedSection from "./reusables/AnimatedSection";
 import { IoLanguageSharp } from "react-icons/io5";
+import { FaBahai } from "react-icons/fa";
 import {
     checkAIConfiguration,
     detectLanguage,
@@ -260,7 +261,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
             <div className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
                 <div
                     ref={chatRef}
-                    className="flex-1 overflow-y-auto min-h-0 relative mb-24"
+                    className="flex-1 overflow-y-auto min-h-0 relative mb-24 chat-scroll"
                 >
                     <div className="absolute inset-0 lg:px-5 pb-5">
                         <div className="py-4 space-y-4 relative h-full">
@@ -297,7 +298,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                         ? ` ${
                                                               selectedTheme ===
                                                               "Neural Nexus"
-                                                                  ? "shadow-lg shadow-teal-300/30"
+                                                                  ? "shadow-lg shadow-teal-300/30 mb-1"
                                                                   : " "
                                                           } chat-bubble p-3`
                                                         : ""
@@ -311,6 +312,11 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                 )}
                                                 {msg.sender === "AI" ? (
                                                     <>
+                                                        <div className="ai-icon mb-2">
+                                                            <FaBahai
+                                                                size={20}
+                                                            />
+                                                        </div>
                                                         <TypingMessage
                                                             text={msg.text}
                                                         />

@@ -125,6 +125,12 @@ body, .header, .drop-container {
   z-index: 100;
 }
 
+.ai-icon {
+  color: var(--chat-bubble);
+}
+
+
+
 @media (max-width: 640px) {
   .logo {
     font-size: 2rem;
