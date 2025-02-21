@@ -25,7 +25,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
     const [currentId, setCurrentId] = useState("");
     const textRef = useRef(null);
     const [isSummarizationInProgress, setIsSummarizationInProgress] =
-        useState(false);
+        useState("");
     const [isTranslationInProgress, setIsTranslationInProgress] =
         useState(false);
     const chatRef = useRef(null);
@@ -57,7 +57,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                 chatRef.current.scrollTop = chatRef.current.scrollHeight;
             }, 100);
         }
-    }, [messages.length]);
+    }, [messages?.length]);
 
     useEffect(() => {
         messages.forEach((msg) => {
@@ -146,8 +146,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
             return;
         }
         try {
-            console.log("I started");
-            setIsSummarizationInProgress(true);
+            setIsSummarizationInProgress(message.id);
             const summarizedText = await textSummarization(message.text);
             const indexOfAIResponse = messages.findIndex(
                 (msg) => msg.summarizedId === message.id
@@ -157,28 +156,32 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                     const updatedMessages = [...prev];
                     updatedMessages[indexOfAIResponse] = {
                         ...updatedMessages[indexOfAIResponse],
-                        text: summarizedText,
+                        text: summarizedText
                     };
                     return updatedMessages;
                 });
                 toast.success("Summarized text updated Successfully");
                 return;
             }
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: prev.length + 1,
+            setMessages((prev) => {
+                const newMessage = {
+                    id: `custom-${Date.now()}`,
                     text: summarizedText,
                     sender: "AI",
                     summarizedId: message.id,
-                },
-            ]);
+                };
+                const updatedMessages = [...prev]
+                const index = message.id
+
+                updatedMessages.splice(index, 0, newMessage)
+                return updatedMessages
+        });
             toast.success("Summarized text Successfully");
         } catch (error) {
             toast.error(error.message);
             console.error(error);
         } finally {
-            setIsSummarizationInProgress(false);
+            setIsSummarizationInProgress("");
         }
     };
 
@@ -304,7 +307,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                         : ""
                                                 }`}
                                             >
-                                                {isSummarizationInProgress && (
+                                                {isSummarizationInProgress === msg.id && (
                                                     <Spinner
                                                         spinnerClass="w-6 h-6"
                                                         className="pb-2"
