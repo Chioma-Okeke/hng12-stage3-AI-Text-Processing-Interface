@@ -76,7 +76,7 @@ function SideBar({
                 </div>
                 <div className="flex flex-col justify-between h-full">
                     <div ref={historyRef}
-                            className={`flex flex-col gap-5 overflow-y-auto custom-scrollbar ${
+                            className={`flex flex-col gap-5 overflow-y-auto custom-scrollbar flex-1 ${
                                 activeRef === historyRef ? "active" : ""
                             }`}>
                         {todayData.length > 0 && (
@@ -208,7 +208,7 @@ function SideBar({
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-5">
                         <div
                             ref={settingsRef}
                             aria-label="settings icon"

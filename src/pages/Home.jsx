@@ -48,7 +48,7 @@ function Home() {
         {
             ref: chatRef,
             description:
-                "An application where you can translate, detect the language of and summarize your long texts",
+                "An AI powered application where you can translate, detect the language of and summarize your long texts",
         },
         {
             ref: newChatRef,
@@ -72,7 +72,9 @@ function Home() {
     const handleNext = () => {
         if (currentStep < steps.length - 1) {
             setCurrentStep((prev) => prev + 1);
+            window.innerWidth < 1280 && currentStep !== 0 && setShowSideBar(true)
         } else {
+            window.innerWidth < 1280 && setShowSideBar(false)
             setActiveRef(null);
             setIsTourActive(false);
             localStorage.setItem("oldUser", true);
@@ -82,6 +84,7 @@ function Home() {
 
     const handleSkip = () => {
         setIsTourActive(false);
+        window.innerWidth < 1280 && setShowSideBar(false)
         localStorage.setItem("pendingOnboarding", true);
     };
 
@@ -356,7 +359,7 @@ function Home() {
                     </div>
                 </Modal>
             )}
-            {isTourActive && window.innerWidth > 1280 && (
+            {isTourActive &&  (
                 <TourModal
                     refElement={steps[currentStep]?.ref}
                     description={steps[currentStep]?.description}

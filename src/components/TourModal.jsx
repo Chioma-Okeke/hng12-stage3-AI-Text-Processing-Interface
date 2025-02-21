@@ -20,13 +20,13 @@ const TourModal = ({
                 const rect = refElement.current.getBoundingClientRect();
                 setPosition({
                     top:
-                        refElement === containerRef
+                        window.innerWidth < 1280 || refElement === containerRef
                             ? "50%"
                             : rect.top > 800
                             ? rect.top - 100
                             : rect.top + window.scrollY,
                     left:
-                        refElement === containerRef
+                        refElement === containerRef || window.innerWidth < 1280
                             ? "50%"
                             : rect.left > 950
                             ? rect.left - 450
@@ -59,10 +59,10 @@ const TourModal = ({
         >
             <div
                 className={`${
-                    refElement === containerRef
+                    refElement === containerRef || window.innerWidth < 1280
                         ? "-translate-x-1/2 -translate-y-1/2"
                         : ""
-                } bg-white p-4 flex flex-col gap-4 tour-container`}
+                } bg-white p-4 flex flex-col gap-4 tour-container w-[90%] mx-auto lg:w-auto`}
                 style={{
                     position: "absolute",
                     top: position.top,
@@ -73,9 +73,9 @@ const TourModal = ({
                     {refElement === containerRef && (
                         <h1 className="logo">Welcome to Texifyit</h1>
                     )}
-                    <p className="text-[#141414]">{description}</p>
+                    <p className="text-[#141414] text-lg sm:text-base">{description}</p>
                 </div>
-                <div className="flex items-center gap-4 justify-center">
+                <div className="flex items-center gap-4 justify-center text-lg sm:text-base">
                     <Button
                         type="button"
                         aria-label="Click to move to the next step"
@@ -104,6 +104,7 @@ TourModal.propTypes = {
     description: PropTypes.string,
     onNext: PropTypes.func,
     onSkip: PropTypes.func,
+    containerRef: PropTypes.element
 };
 
 export default TourModal;

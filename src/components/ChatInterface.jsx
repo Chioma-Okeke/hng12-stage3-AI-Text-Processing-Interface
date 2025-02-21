@@ -267,6 +267,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
             toast.success("Copied to clipboard!");
         } catch (err) {
             toast.error("Failed to copy");
+            console.error(err)
         }
     }
 
