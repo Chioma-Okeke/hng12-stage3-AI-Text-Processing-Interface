@@ -263,7 +263,6 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
 
     async function copyToClipboard(text) {
         try {
-            console.log("working");
             await navigator.clipboard.writeText(text);
             toast.success("Copied to clipboard!");
         } catch (err) {
@@ -349,7 +348,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                         {showCopyIcon ==
                                                             msg.id && (
                                                             <Button
-                                                                className="z-40"
+                                                                className="absolute top-0 right-0"
                                                                 onClick={(
                                                                     e
                                                                 ) => {
@@ -361,7 +360,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                             >
                                                                 <FaRegCopy
                                                                     size={20}
-                                                                    className="absolute top-0 right-0 cursor-pointer hover:scale-110"
+                                                                    className="cursor-pointer hover:scale-110"
                                                                 />
                                                             </Button>
                                                         )}
@@ -510,12 +509,6 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                         return (
                                                             <div
                                                                 onMouseEnter={() => {
-                                                                    console.log(
-                                                                        translation.language +
-                                                                            String(
-                                                                                msg.id
-                                                                            )
-                                                                    );
                                                                     setShowCopyIcon(
                                                                         translation.language +
                                                                             String(
@@ -581,12 +574,13 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
                                                                                 translation.result
                                                                             );
                                                                         }}
+                                                                        className="absolute top-0 -right-5 "
                                                                     >
                                                                         <FaRegCopy
                                                                             size={
                                                                                 20
                                                                             }
-                                                                            className="absolute top-0 -right-5 cursor-pointer hover:scale-110"
+                                                                            className="cursor-pointer hover:scale-110"
                                                                         />
                                                                     </Button>
                                                                 )}

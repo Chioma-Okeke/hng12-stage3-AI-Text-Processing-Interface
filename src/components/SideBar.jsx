@@ -81,7 +81,7 @@ function SideBar({
                             }`}>
                         {todayData.length > 0 && (
                             <div>
-                                <p className="font-semibold px-2">Today</p>
+                                <p className="font-semibold px-2 lg:pb-1">Today</p>
                                 <ol className="flex flex-col">
                                     {todayData?.map((message, index) => {
                                         return (
@@ -95,7 +95,7 @@ function SideBar({
                                                         populateChat(message);
                                                     }
                                                 }}
-                                                className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
+                                                className="cursor-pointer hover:border hover:border-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
                                                 key={index}
                                                 onClick={() =>
                                                     populateChat(message)
@@ -125,7 +125,7 @@ function SideBar({
                         )}
                         {yesterdayData.length > 0 && (
                             <div>
-                                <p className="font-semibold px-2">Yesterday</p>
+                                <p className="font-semibold px-2 lg:pb-1">Yesterday</p>
                                 <ol className="flex flex-col">
                                     {yesterdayData?.map((message, index) => {
                                         return (
@@ -139,7 +139,7 @@ function SideBar({
                                                         populateChat(message);
                                                     }
                                                 }}
-                                                className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
+                                                className="cursor-pointer hover:border hover:border-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
                                                 key={index}
                                                 onClick={() =>
                                                     populateChat(
@@ -167,7 +167,7 @@ function SideBar({
                         )} 
                         {prev7DaysData.length > 0 && (
                             <div>
-                                <p className="font-semibold px-2">Last 7 Days</p>
+                                <p className="font-semibold px-2 lg:pb-1">Last 7 Days</p>
                                 <ol className="flex flex-col">
                                     {prev7DaysData?.map((message, index) => {
                                         return (
@@ -181,7 +181,7 @@ function SideBar({
                                                         populateChat(message);
                                                     }
                                                 }}
-                                                className="cursor-pointer hover:bg-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
+                                                className="cursor-pointer hover:border hover:border-gray-200 transition-colors ease-in-out duration-300 p-2 rounded-xl flex flex-row items-center justify-between"
                                                 key={index}
                                                 onClick={() =>
                                                     populateChat(
