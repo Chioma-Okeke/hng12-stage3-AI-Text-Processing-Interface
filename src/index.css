@@ -114,6 +114,17 @@ body, .header, .drop-container {
   border-top: 4px solid rgba(var(--chat-bubble));
 }
 
+.tour-container {
+  border: 2px solid var(--sidebar-border-color);
+  border-radius: 24px;
+}
+
+.active {
+  border: 2px solid red;; 
+  padding: 2px;
+  z-index: 100;
+}
+
 @media (max-width: 640px) {
   .logo {
     font-size: 2rem;

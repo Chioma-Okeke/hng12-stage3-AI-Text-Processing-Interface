@@ -16,7 +16,7 @@ import {
 import Spinner from "./reusables/Spinner";
 import { supportedLanguages } from "../data/languages";
 
-function ChatInterface({ selectedTheme, setMessages, messages }) {
+function ChatInterface({ selectedTheme, setMessages, messages, containerRef }) {
     const [input, setInput] = useState("");
     const [targetLanguage, setTargetLanguage] = useState("");
     const [errorOn, setErrorOn] = useState("");
@@ -225,7 +225,7 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
 
     return (
         <div className="absolute inset-0 flex flex-col max-h-[calc(100vh - 65px)] text-sm md:text-base">
-            <div className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
+            <div ref={containerRef} className="max-w-[780px] mx-auto w-full h-full flex flex-col px-4 lg:px-0 relative">
                 <div className="flex-1 overflow-y-auto min-h-0 relative mb-24">
                     <div className="absolute inset-0 lg:px-5 pb-5">
                         <div className="py-4 space-y-4 relative h-full">

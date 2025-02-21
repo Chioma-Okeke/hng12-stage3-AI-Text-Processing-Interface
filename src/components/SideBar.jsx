@@ -18,6 +18,7 @@ function SideBar({
     historyRef,
     settingsRef,
     helpRef,
+    activeRef
 }) {
     const [todayData, setTodayData] = useState([]);
     const [yesterdayData, setYesterdayData] = useState([]);
@@ -74,7 +75,10 @@ function SideBar({
                     </div>
                 </div>
                 <div className="flex flex-col justify-between h-full">
-                    <div ref={historyRef} className="flex flex-col gap-5">
+                    <div ref={historyRef}
+                            className={`flex flex-col gap-5 ${
+                                activeRef === historyRef ? "active" : ""
+                            }`}>
                         {todayData.length > 0 && (
                             <div>
                                 <p className="font-semibold px-2">Today</p>
@@ -219,6 +223,9 @@ function SideBar({
                                 setOpenSettings(true);
                                 handleSideBarToggle();
                             }}
+                            className={`${
+                                activeRef === settingsRef ? "active" : ""
+                            }`}
                         >
                             <IoSettingsOutline
                                 size={25}
@@ -239,6 +246,9 @@ function SideBar({
                                 setOpenHelp(true);
                                 handleSideBarToggle();
                             }}
+                            className={`${
+                                activeRef === helpRef ? "active" : ""
+                            }`}
                         >
                             <LuCircleHelp
                                 size={25}

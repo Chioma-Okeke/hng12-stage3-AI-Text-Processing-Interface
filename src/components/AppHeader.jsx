@@ -2,7 +2,14 @@ import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import PropTypes from "prop-types";
 import { LiaEditSolid } from "react-icons/lia";
 
-function AppHeader({ showSideBar, setShowSideBar, startNewChat }) {
+function AppHeader({
+    showSideBar,
+    setShowSideBar,
+    startNewChat,
+    newChatRef,
+    activeRef,
+}) {
+    console.log(activeRef, "ref")
     return (
         <header className="p-5 w-full header mb-2">
             <div className="flex items-center justify-between">
@@ -30,11 +37,14 @@ function AppHeader({ showSideBar, setShowSideBar, startNewChat }) {
                     Texifyit
                 </h1>
                 <div
+                    ref={newChatRef}
                     tabIndex={0}
                     onKeyDown={(e) => e.key === "Enter" && startNewChat()}
                     onClick={startNewChat}
                     aria-label="Edit Icon"
-                    className="cursor-pointer"
+                    className={`cursor-pointer ${
+                        activeRef === newChatRef ? "active" : ""
+                    }`}
                 >
                     <LiaEditSolid size={25} className="hover:scale-110" />
                 </div>

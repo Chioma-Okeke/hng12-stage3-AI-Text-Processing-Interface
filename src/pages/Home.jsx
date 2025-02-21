@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ChatInterface from "../components/ChatInterface";
 import SideBar from "../components/SideBar";
 import AppHeader from "../components/AppHeader";
@@ -21,6 +21,7 @@ import {
     updateMessagesDB,
 } from "../utils/storage";
 import { FAQ } from "../data/faq";
+import TourModal from "../components/TourModal";
 
 function Home() {
     const [showSideBar, setShowSideBar] = useState(
@@ -31,6 +32,54 @@ function Home() {
     const [openHelp, setOpenHelp] = useState(false);
     const [messages, setMessages] = useState([]);
     const [fetchedData, setFetchedData] = useState([]);
+    const [currentStep, setCurrentStep] = useState(0);
+    const [activeRef, setActiveRef] = useState(null);
+    const [isTourActive, setIsTourActive] = useState(
+        !localStorage.getItem("oldUser")
+    );
+    const newChatRef = useRef(null);
+    const historyRef = useRef(null);
+    const settingsRef = useRef(null);
+    const helpRef = useRef(null);
+    const chatRef = useRef(null);
+
+    const steps = [
+        {
+            ref: chatRef,
+            description:
+                "Welcome to Texifyit. An application where you can translate, detect the language of and summarize your texts",
+        },
+        {
+            ref: newChatRef,
+            description:
+                "This is the new chat icon you can use to start a new chat.",
+        },
+        { ref: historyRef, description: "You will see all chat history here" },
+        {
+            ref: settingsRef,
+            description: "You come here for UI customization and other things",
+        },
+        {
+            ref: helpRef,
+            description: "You can find out more about the product here",
+        },
+    ];
+    useEffect(() => {
+        setActiveRef(steps[currentStep].ref);
+    }, [currentStep]);
+
+    const handleNext = () => {
+        if (currentStep < steps.length - 1) {
+            setCurrentStep((prev) => prev + 1);
+        } else {
+            setIsTourActive(false);
+        }
+    };
+
+    const handleSkip = () => {
+        setIsTourActive(false);
+        localStorage.setItem("oldUser", true);
+    };
 
     useEffect(() => {
         const savedTheme = localStorage.getItem("selectedTheme") || "light";
@@ -107,7 +156,6 @@ function Home() {
                 toast.success("Chat successfully saved");
             } else {
                 const chat = JSON.parse(currentChat);
-                console.log(chat, "here");
                 const updatedMessages = {
                     messages: messages,
                     timeStamp: new Date(),
@@ -137,7 +185,7 @@ function Home() {
 
     const sidebarWidth = window.innerWidth > 1280 ? "261px" : "";
     return (
-        <main className="relative h-screen w-full ">
+        <main ref={chatRef} className="relative h-screen w-full ">
             <AnimatePresence>
                 {showSideBar && (
                     <motion.div
@@ -157,6 +205,10 @@ function Home() {
                             populateChat={populateChat}
                             fetchedData={fetchedData}
                             deleteChat={deleteChat}
+                            historyRef={historyRef}
+                            settingsRef={settingsRef}
+                            helpRef={helpRef}
+                            activeRef={activeRef}
                         />
                     </motion.div>
                 )}
@@ -173,6 +225,8 @@ function Home() {
                     showSideBar={showSideBar}
                     setShowSideBar={setShowSideBar}
                     startNewChat={openNewChat}
+                    newChatRef={newChatRef}
+                    activeRef={activeRef}
                 />
                 <div
                     aria-label="chat output area"
@@ -295,6 +349,15 @@ function Home() {
                         </ul>
                     </div>
                 </Modal>
+            )}
+            {isTourActive && window.innerWidth > 1280 && (
+                <TourModal
+                    refElement={steps[currentStep]?.ref}
+                    description={steps[currentStep]?.description}
+                    onNext={handleNext}
+                    onSkip={handleSkip}
+                    containerRef={chatRef}
+                />
             )}
         </main>
     );
