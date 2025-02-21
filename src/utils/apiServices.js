@@ -48,7 +48,6 @@ async function getSummarizerCapabilities() {
     return cachedCapabilities.summarizer;
 }
 
-
 export const detectLanguage = async (message) => {
     const capabilities = await getLanguageDetectorCapabilities();
 
@@ -79,8 +78,11 @@ export const detectLanguage = async (message) => {
 
         return (
             languageMap[result.detectedLanguage] ||
-            "beyond our language database"
+            "beyond our current language database."
         );
+    } catch (error) {
+        console.error(error);
+        throw new Error("Could not detect language at the moment.");
     } finally {
         // Clean up resources
         if (detector) {
@@ -89,54 +91,64 @@ export const detectLanguage = async (message) => {
     }
 };
 
-export const textTranslation = async (userMessage, expectedResponseLanguage) => {
-    if (!('ai' in self) || !('translator' in self.ai)) {
-      throw new Error("Translator API not supported in this browser");
+export const textTranslation = async (
+    userMessage,
+    expectedResponseLanguage
+) => {
+    if (!("ai" in self) || !("translator" in self.ai)) {
+        throw new Error("Translator API not supported in this browser");
     }
-    
+
     const languageMap = {
-      English: "en",
-      French: "fr",
-      Portuguese: "pt",
-      Spanish: "es",
-      Turkish: "tr",
-      Russian: "ru",
+        English: "en",
+        French: "fr",
+        Portuguese: "pt",
+        Spanish: "es",
+        Turkish: "tr",
+        Russian: "ru",
     };
-    
+
     const incomingLanguage = languageMap[userMessage.detectedLanguage];
     if (!incomingLanguage) {
-      throw new Error(`Unsupported source language: ${userMessage.detectedLanguage}`);
+        throw new Error(
+            `Unsupported source language: ${userMessage.detectedLanguage}`
+        );
     }
-    
+
     const translatorCapabilities = await self.ai.translator.capabilities();
     const pairAvailable = translatorCapabilities.languagePairAvailable(
-      incomingLanguage,
-      expectedResponseLanguage
+        incomingLanguage,
+        expectedResponseLanguage
     );
-  
+
     if (pairAvailable === "no") {
-      throw new Error(`Translation from ${incomingLanguage} to ${expectedResponseLanguage} not available`);
+        throw new Error(
+            `Translation from ${incomingLanguage} to ${expectedResponseLanguage} not available`
+        );
     }
-    
+
     let translator = null;
     try {
-      translator = await self.ai.translator.create({
-        sourceLanguage: incomingLanguage,
-        targetLanguage: expectedResponseLanguage,
-      });
+        translator = await self.ai.translator.create({
+            sourceLanguage: incomingLanguage,
+            targetLanguage: expectedResponseLanguage,
+        });
 
-      if (pairAvailable === "after-download") {
-        await translator.ready;
-      }
-      
-      return await translator.translate(userMessage.text);
+        if (pairAvailable === "after-download") {
+            await translator.ready;
+        }
+
+        return await translator.translate(userMessage.text);
+    } catch (error) {
+        console.error(error);
+        throw new Error("Could not translate text. Kindly try again.");
     } finally {
-      // Clean up resources
-      if (translator) {
-        translator.destroy?.();
-      }
+        // Clean up resources
+        if (translator) {
+            translator.destroy?.();
+        }
     }
-  };
+};
 
 export const textSummarization = async (message) => {
     const capabilities = await getSummarizerCapabilities();
@@ -157,9 +169,9 @@ export const textSummarization = async (message) => {
     let summarizer = null;
     try {
         summarizer = await self.ai.summarizer.create(options);
-        console.log(summarizer, "??")
+        console.log(summarizer, "??");
         if (capabilities.available === "after-download") {
-            console.log("i am inside here")
+            console.log("i am inside here");
             summarizer.addEventListener("downloadprogress", (e) => {
                 console.log(
                     `Downloading summarizer model: ${Math.round(
@@ -169,8 +181,11 @@ export const textSummarization = async (message) => {
             });
             await summarizer.ready;
         }
-        console.log("...processing")
+        console.log("...processing");
         return await summarizer.summarize(message);
+    } catch (error) {
+        console.error(error);
+        throw new Error("Could not summarize text. Kindly try again.");
     } finally {
         // Clean up resources
         if (summarizer) {
