@@ -1,3 +1,25 @@
+export const checkAIConfiguration = async () => {
+    try {
+        const languageDetectorCapabilities =
+            await self.ai.languageDetector.capabilities();
+        const canDetect = languageDetectorCapabilities.capabilities;
+        if ("ai" in self && "translator" in self.ai) {
+            console.log("The Translator API is supported.");
+        }
+        const available = (await self.ai.summarizer.capabilities()).available;
+
+        return(
+            canDetect === "no" &&
+                "ai" in self &&
+                "translator" in self.ai &&
+                available === "no"
+        );
+    } catch (error) {
+        console.log(error)
+        return "Not Supported"
+    }
+};
+
 export const detectLanguage = async (message) => {
     const languageDetectorCapabilities =
         await self.ai.languageDetector.capabilities();

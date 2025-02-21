@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import AnimatedSection from "./reusables/AnimatedSection";
 import { IoLanguageSharp } from "react-icons/io5";
 import {
+    checkAIConfiguration,
     detectLanguage,
     textSummarization,
     textTranslation,
@@ -82,16 +83,9 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
     };
 
     const sendMessage = async () => {
-
-        const checkAIConfiguration = () => {
-            return (
-              'summarizer' in window &&
-              'translator' in window &&
-              'detector' in window
-            );
-        };
-
-        if (!checkAIConfiguration()) {
+        const isAllowed = await checkAIConfiguration()
+        console.log(isAllowed)
+        if (isAllowed || isAllowed === "Not Supported") {
             toast.error("Your browser does not support the needed built-in AI tools.");
             return;
         }
