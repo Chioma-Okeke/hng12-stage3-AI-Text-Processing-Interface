@@ -114,10 +114,13 @@ function ChatInterface({ selectedTheme, setMessages, messages }) {
 
     const sendMessage = async () => {
         const isAllowed = await checkAIConfiguration();
-        if (!isAllowed || isAllowed === "Not Supported") {
-            toast.error(
+        if (!isAllowed || isAllowed === "Not Supported "){
+            if (window.innerWidth < 1024) {
+                toast.error(
                 "AI features work best on the desktop version of Chrome."
-            );
+            )} else {
+                toast.error("You need to have the Chrome built-in AI configured. Visit help center for assistance on that")
+            }
             return;
         }
 

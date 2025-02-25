@@ -23,4 +23,8 @@ export const FAQ = [
         question: "What languages are supported for translation?",
         answer: "Texifyit currently supports translation to and from English, Portuguese, French, Spanish, Russian, and Turkish",
     },
+    {
+        question: "Need help setting up Chrome built-in AI configurations?",
+        answer: "Kindly visit the Chrome built-in API documentation via https://developer.chrome.com/docs/ai/"
+    }
 ];

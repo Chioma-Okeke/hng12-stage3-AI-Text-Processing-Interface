@@ -6,16 +6,17 @@ An intelligent text processing application leveraging Chrome's AI APIs to provid
 
 ### ✨ AI-Powered Processing
 - **Summarization:** Get concise versions of lengthy text.
-- **Translation:** Convert text into multiple languages with ease.
+- **Translation:** Convert text into multiple languages with ease. (supported languages are English, French, Spanish, Portuguese, Turkish and Russian)
 - **Language Detection:** Automatically detects the language of input text.
 
 ### 🎨 User Interface
 - **Chat-Style Interface:** Engaging and intuitive design.
 - **Theming Support:** Different themes for user customization.
+- **Chat History:** Section to view and edit previous chats.
 - **Fully Responsive:** Optimized for both desktop and mobile devices.
 
 ### ⚡ Performance & State Management
-- **IndexedDB** Manage chat history
+- **IndexedDB** Manage chat history.
 - **Local Storage Support:** Retains user preferences across sessions.
 
 ### 🛠️ Accessibility & UX Enhancements
@@ -51,7 +52,6 @@ yarn dev  # or npm run dev
 ## Future Enhancements 🔮
 - **Voice Input Support** 🎙️
 - **More AI-powered text processing features**
-- **Dark Mode Enhancements**
 
 ---
 
