@@ -83,6 +83,7 @@ function Home() {
     };
 
     const handleSkip = () => {
+        setActiveRef(null);
         setIsTourActive(false);
         window.innerWidth < 1280 && setShowSideBar(false)
         localStorage.setItem("pendingOnboarding", true);
